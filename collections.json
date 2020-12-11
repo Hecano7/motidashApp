@@ -1,0 +1,225 @@
+{
+  "info": {
+  "_postman_id": "e5bd723f-e08d-4cdd-aad5-89129f9c8b9e",
+  "name": "Motidash",
+  "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+  {
+  "name": "Login",
+  "_postman_id": "ed19b6f2-9779-40de-a547-7e23b33dfa0a",
+  "request": {
+  "method": "POST",
+  "header": [
+  {
+  "key": "Content-Type",
+  "name": "Content-Type",
+  "value": "application/json",
+  "type": "text"
+  }
+  ],
+  "body": {
+  "mode": "formdata",
+  "formdata": [
+  {
+  "key": "user_account[email]",
+  "value": "pawel@example.org",
+  "type": "text"
+  },
+  {
+  "key": "user_account[password]",
+  "value": "motidash testing",
+  "type": "text"
+  },
+  {
+  "key": "platform",
+  "value": "mobile-ios",
+  "type": "text"
+  }
+  ],
+  "options": {
+  "raw": {
+  "language": "json"
+  }
+  }
+  },
+  "url": "http://motidash.local:3000/en/user/session.json"
+  },
+  "response": []
+  },
+  {
+  "name": "Goals",
+  "_postman_id": "3761e3ed-8f46-4c4f-b0d5-a97fabfb14f8",
+  "request": {
+  "method": "GET",
+  "header": [
+  {
+  "key": "token",
+  "value": "d18ab82d-9521-429d-b0ea-e804457b8375",
+  "type": "text"
+  }
+  ],
+  "url": "http://motidash.local:3000/en/user/goals/objectives.json"
+  },
+  "response": []
+  },
+  {
+  "name": "New goal (invalid)",
+  "_postman_id": "4bdc43ec-2b8d-44db-9bf7-aaa7e7d6486d",
+  "request": {
+  "method": "POST",
+  "header": [
+  {
+  "key": "token",
+  "type": "text",
+  "value": "d18ab82d-9521-429d-b0ea-e804457b8375"
+  }
+  ],
+  "body": {
+  "mode": "formdata",
+  "formdata": [
+  {
+  "key": "okr_objective[name]",
+  "value": "New goal from the API",
+  "type": "text"
+  },
+  {
+  "key": "okr_objective[category]",
+  "value": "",
+  "type": "text"
+  }
+  ]
+  },
+  "url": "http://motidash.local:3000/en/user/goals/objectives.json"
+  },
+  "response": []
+  },
+  {
+  "name": "Edit goal (invalid)",
+  "_postman_id": "0922f02c-3d3a-4aac-a73b-ede8f85ec6bb",
+  "request": {
+  "method": "PATCH",
+  "header": [
+  {
+  "key": "token",
+  "type": "text",
+  "value": "d18ab82d-9521-429d-b0ea-e804457b8375"
+  }
+  ],
+  "body": {
+  "mode": "formdata",
+  "formdata": [
+  {
+  "key": "okr_objective[name]",
+  "value": "New goal from the API",
+  "type": "text"
+  },
+  {
+  "key": "okr_objective[category]",
+  "value": "",
+  "type": "text"
+  }
+  ]
+  },
+  "url": "http://motidash.local:3000/en/user/goals/objectives/807e96a0-92a9-4984-81e4-751ec6e3a22a.json"
+  },
+  "response": []
+  },
+  {
+  "name": "New goal (valid)",
+  "_postman_id": "4f95b519-5797-41e2-b48f-ea7b9c50b934",
+  "request": {
+  "method": "POST",
+  "header": [
+  {
+  "key": "token",
+  "type": "text",
+  "value": "d18ab82d-9521-429d-b0ea-e804457b8375"
+  }
+  ],
+  "body": {
+  "mode": "formdata",
+  "formdata": [
+  {
+  "key": "okr_objective[name]",
+  "value": "New goal from the API",
+  "type": "text"
+  },
+  {
+  "key": "okr_objective[category]",
+  "value": "context",
+  "type": "text"
+  }
+  ]
+  },
+  "url": "http://motidash.local:3000/en/user/goals/objectives.json"
+  },
+  "response": []
+  },
+  {
+  "name": "Edit goal (valid)",
+  "_postman_id": "563f017b-9c78-4533-8faf-c542afb32326",
+  "request": {
+  "method": "PATCH",
+  "header": [
+  {
+  "key": "token",
+  "type": "text",
+  "value": "d18ab82d-9521-429d-b0ea-e804457b8375"
+  }
+  ],
+  "body": {
+  "mode": "formdata",
+  "formdata": [
+  {
+  "key": "okr_objective[name]",
+  "value": "New goal from the API (updated)",
+  "type": "text"
+  },
+  {
+  "key": "okr_objective[category]",
+  "value": "core",
+  "type": "text"
+  }
+  ]
+  },
+  "url": "http://motidash.local:3000/en/user/goals/objectives/807e96a0-92a9-4984-81e4-751ec6e3a22a.json"
+  },
+  "response": []
+  },
+  {
+  "name": "Delete goal",
+  "_postman_id": "1dafa2a2-6d3b-4f0a-a98f-4aa5a3df669e",
+  "request": {
+  "method": "DELETE",
+  "header": [
+  {
+  "key": "token",
+  "type": "text",
+  "value": "d18ab82d-9521-429d-b0ea-e804457b8375"
+  }
+  ],
+  "body": {
+  "mode": "formdata",
+  "formdata": [
+  {
+  "key": "okr_objective[name]",
+  "value": "New goal from the API (updated)",
+  "type": "text",
+  "disabled": true
+  },
+  {
+  "key": "okr_objective[category]",
+  "value": "core",
+  "type": "text",
+  "disabled": true
+  }
+  ]
+  },
+  "url": "http://motidash.local:3000/en/user/goals/objectives/807e96a0-92a9-4984-81e4-751ec6e3a22a.json"
+  },
+  "response": []
+  }
+  ],
+  "protocolProfileBehavior": {}
+  }

@@ -4,11 +4,10 @@
     "slug": "motidash",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "src/img/MotidashLogo.png",
     "splash": {
       "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#2b2b2b"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -21,12 +20,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "foregroundImage": "src/img/MotidashLogo.png",
+        "backgroundColor": "#2b2b2b"
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "src/img/Motidash-Logo.png"
     }
   }
 }
