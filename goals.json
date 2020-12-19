@@ -1,0 +1,52 @@
+[
+  {
+      "category": "core",
+      "completion": 50.0,
+      "finished": false,
+      "finished_at": null,
+      "id": "bd9768f8-d7e3-4f4b-a6da-b7a27cf192fa",
+      "name": "New core goal from the API",
+      "position": 2,
+      "activities_pending": [
+          {
+              "deadline_at": null,
+              "finished": false,
+              "finished_at": null,
+              "id": "0768b068-e726-458f-9999-7130c35a83c2",
+              "name": "New recurring activity from the API",
+              "overdue": false,
+              "points": 0,
+              "position": 2,
+              "recurring": "daily",
+              "soon": false
+          }
+      ],
+      "activities_overdue": [],
+      "activities_finished": [
+          {
+              "deadline_at": null,
+              "finished": "2020-12-08T11:29:44.657Z",
+              "finished_at": "2020-12-08T11:29:44.650Z",
+              "id": "ba1e98b2-9f43-4d29-a1c2-a9e9fa61a7cb",
+              "name": "New activity from the API",
+              "overdue": false,
+              "points": 0,
+              "position": 1,
+              "recurring": null,
+              "soon": false
+          }
+      ]
+  },
+  {
+      "category": "core",
+      "completion": 0.0,
+      "finished": false,
+      "finished_at": null,
+      "id": "21285271-1011-47a2-bd54-2d5ce3b72d35",
+      "name": "Add a second goal for iteration",
+      "position": 1,
+      "activities_pending": [],
+      "activities_overdue": [],
+      "activities_finished": []
+  }
+]

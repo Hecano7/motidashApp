@@ -52,9 +52,9 @@ export const Providers: React.FC<ProvidersProps> = ({}) => {
   }
     return (
       <Provider store={store}>
-      <AuthProvider>
-        <Routes />
-      </AuthProvider>
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
       </Provider>
     );
 }

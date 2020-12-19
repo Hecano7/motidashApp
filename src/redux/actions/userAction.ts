@@ -3,9 +3,6 @@ import { Dispatch } from 'react';
 import { BASE_URL } from '../../utils';
 
 export interface UserModel {
-  firstName: string;
-  lastName: string;
-  subscription: string;
   token: string;
 }
 
@@ -31,7 +28,7 @@ export const onLogin = (email: string, password: string) => {
           email,
           password
         },
-        "platform": "mobile-android"
+        "platform": "mobile-ios"
       });
 
       if (!response) {

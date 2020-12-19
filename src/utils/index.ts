@@ -1,1 +1,1 @@
-export const BASE_URL = "https://motidash-pr-17.herokuapp.com/en/user/";
+export const BASE_URL = "https://motidash-staging.herokuapp.com/en/user/";
