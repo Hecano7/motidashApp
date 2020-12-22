@@ -10,6 +10,8 @@ import { ApplicationState } from '../src/redux';
 import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, SimpleLineIcons, Ionicons, Octicons } from '@expo/vector-icons';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
+import Animated from 'react-native-reanimated';
+import BottomSheet from 'reanimated-bottom-sheet';
 
 
 interface AppTabsProps {
@@ -27,7 +29,8 @@ function LeaderBoard() {
   )
 }
 
-function GoalsList({ navigation }) {
+function GoalsList({ sheetRef , navigation}) {
+
   const [goals, goalsRecieved] = useState([]);
   const { userGoals, error } = useSelector((state: ApplicationState) => state.loadUserDataReducer);
   useEffect(() => {
@@ -116,7 +119,7 @@ function GoalsList({ navigation }) {
           )
         })}
       </ScrollView>
-      <TouchableOpacity style={{ backgroundColor: "#48B0B1", height: 60, width: 60, borderRadius: 100, justifyContent: "center", alignItems: "center", zIndex: 1, alignSelf: "flex-end", marginBottom: "5%", marginRight: "5%" }} onPress={() => { console.log("hit") }}>
+      <TouchableOpacity style={{ backgroundColor: "#48B0B1", height: 60, width: 60, borderRadius: 100, justifyContent: "center", alignItems: "center", zIndex: 1, alignSelf: "flex-end", marginBottom: "5%", marginRight: "5%" }} onPress={() => sheetRef.current.snapTo(0)}>
         <Octicons name="plus-small" size={60} color="white" />
       </TouchableOpacity>
     </SafeAreaView>
@@ -141,6 +144,7 @@ function Goal({ navigation, route }) {
         </View>
         <Text style={{ fontSize: 15, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{goal.completion}%</Text>
       </View>
+      <ScrollView style={{ width: "100%" }}>
       <View style={{marginBottom: "5%"}}>
       <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
       {goal.activities_overdue.map(pen => {
@@ -218,7 +222,7 @@ function Goal({ navigation, route }) {
                 return (
                   <View key={pen} >
                     <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                      <CheckBox che style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></CheckBox>
+                      <CheckBox  style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></CheckBox>
                       <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                     </View>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -246,15 +250,18 @@ function Goal({ navigation, route }) {
               })}
         </View>
         : null}
+        </ScrollView>
     </SafeAreaView>
   )
 }
 
-function GoalsTab() {
+function GoalsTab({sheetRef}) {
   const GoalsStack = createStackNavigator();
   return (
     <GoalsStack.Navigator initialRouteName="GoalsList">
-      <GoalsStack.Screen name="GoalsList" options={{ header: () => null }} component={GoalsList} />
+      <GoalsStack.Screen name="GoalsList" options={{ header: () => null }} >
+        {(props) => <GoalsList  {...props} sheetRef={sheetRef} />}
+      </GoalsStack.Screen>
       <GoalsStack.Screen name="Goal" options={{ header: () => null }} component={Goal} />
     </GoalsStack.Navigator>
   );
@@ -263,19 +270,35 @@ function GoalsTab() {
 function Search() {
   const { logout } = useContext(AuthContext);
   return (
-    <Center>
-      <Button title='logout' onPress={() => logout()} />
-      <Moticon
-        name='Bullseye-Pointer'
-        size={28}
-        color='green'
-      />
-    </Center>
+      <View
+        style={{
+          height: "100%",
+          backgroundColor: 'papayawhip',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <Button
+          title="Logout"
+          onPress={() => logout()}
+        />
+      </View>
   )
 }
 
 export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
+  const renderContent = () => (
+    <View style={{backgroundColor: 'white',height: "100%"}}>
+      <View style={{flexDirection: 'row', justifyContent: 'space-between',alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "12%", width: "100%", paddingLeft: "2%"}}>
+        <Entypo name="cross" size={40} color="black" onPress={() => sheetRef.current.snapTo(2)}/>
+        <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold"}}>Add new goal</Text>
+        <View style={{width: "18%"}}/>
+      </View>
+    </View>
+  );
+  const sheetRef = React.useRef(null);
   return (
+    <View style={{flex: 1}}>
     <Tabs.Navigator
       lazy={false}
       tabBarOptions={{
@@ -296,14 +319,15 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       }}>
       <Tabs.Screen
         name='Goals'
-        component={GoalsTab}
         options={{
           tabBarLabel: 'Goals',
           tabBarIcon: (
             { color, size }) => (
             <Moticon name='Bullseye-Pointer' size={30} color={color} />
           ),
-        }} />
+        }}>
+          {(props) => <GoalsTab  {...props} sheetRef={sheetRef} />}
+          </Tabs.Screen>
       <Tabs.Screen
         name='ActionPlans'
         component={Search}
@@ -339,8 +363,14 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
           tabBarIcon: ({ color, size }) => (
             <Moticon name='LeaderBoard' size={30} color={color} />
           ),
-        }} />
+        }}/>
     </Tabs.Navigator>
+        <BottomSheet
+          ref={sheetRef}
+          snapPoints={["75%", 300, 0]}
+          renderContent={renderContent}
+        />
+        </View>
   );
 }
 
