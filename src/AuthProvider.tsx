@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { AsyncStorage } from 'react-native';
+import  AsyncStorage  from "@react-native-community/async-storage";
 
 type User = null | { username: string }
 
@@ -27,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
       logout: () => {
         setUser(null);
         AsyncStorage.removeItem("user");
+        AsyncStorage.removeItem("account");
       }
     }}>{children}
     </AuthContext.Provider>;

@@ -1,18 +1,21 @@
-import React, { useContext, Component, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AppParamList } from './AppParamList';
 import { Center } from './Center';
 import { StyleSheet, Button, Text, View, SafeAreaView, TextInput } from "react-native";
 import { AuthContext } from './AuthProvider';
 import Moticon from '../customIcon';
-import { useSelector } from 'react-redux';
-import { ApplicationState } from '../src/redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { ApplicationState, onLogin, onUserData } from '../src/redux';
 import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, SimpleLineIcons, Ionicons, Octicons, FontAwesome, EvilIcons } from '@expo/vector-icons';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import BottomSheet from 'reanimated-bottom-sheet';
 import { Checkbox } from 'react-native-paper';
-
+import AsyncStorage from '@react-native-community/async-storage';
+import { BASE_URL } from './utils';
+import axios from 'axios';
+import { AntDesign } from '@expo/vector-icons'; 
 
 interface AppTabsProps {
   store: any
@@ -30,11 +33,17 @@ function LeaderBoard() {
 }
 
 function GoalsList({ sheetRef, navigation }) {
-
+  const dispatch = useDispatch();
+  const { user } = useSelector((state: ApplicationState) => state.userReducer);
+  const { token } = user;
   const [goals, goalsRecieved] = useState([]);
   const { userGoals, error } = useSelector((state: ApplicationState) => state.loadUserDataReducer);
+  const reload = () => {
+    dispatch(onUserData(token));
+  };
   useEffect(() => {
-    if (userGoals[0] !== undefined) {
+    console.log(userGoals);
+    if ((userGoals[0] !== undefined)) {
       goalsRecieved(JSON.parse(JSON.stringify(userGoals)));
     }
   }, [userGoals, error]);
@@ -44,6 +53,10 @@ function GoalsList({ sheetRef, navigation }) {
       <View style={{ height: "15%", flexDirection: "row", paddingLeft: "6%", alignItems: "flex-end", paddingBottom: "3%" }}>
         <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
         <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
+        <Button
+          title="Reload"
+          onPress={reload}
+        />
       </View>
       <ScrollView style={{ width: "100%" }}>
         {goals.map(elm => {
@@ -119,9 +132,18 @@ function GoalsList({ sheetRef, navigation }) {
           )
         })}
       </ScrollView>
-      <TouchableOpacity style={{ backgroundColor: "#48B0B1", height: 60, width: 60, borderRadius: 100, justifyContent: "center", alignItems: "center", zIndex: 1, alignSelf: "flex-end", marginBottom: "5%", marginRight: "5%" }} onPress={() => sheetRef.current.snapTo(0)}>
+      {/* <TouchableOpacity style={{ backgroundColor: "#48B0B1", height: 60, width: 60, borderRadius: 100, justifyContent: "center", alignItems: "center", zIndex: 1, alignSelf: "flex-end", marginBottom: "5%", marginRight: "5%" }} onPress={() => { sheetRef.current.snapTo(0); console.log(userGoals); }}>
         <Octicons name="plus-small" size={60} color="white" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      <AntDesign name="pluscircle" size={64} color="black" style={{
+      width: 80,  
+      height: 80,   
+      borderRadius: 30,            
+      position: 'absolute',                                          
+      bottom: 10,                                                    
+      right: 10,
+      color: "#48B0B1" }}
+      onPress={() => { sheetRef.current.snapTo(0); console.log(userGoals); }}/>
     </SafeAreaView>
   )
 }
@@ -152,7 +174,7 @@ function Goal({ navigation, route }) {
             return (
               <View key={pen}>
                 <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                  <Checkbox  status={"checked"} style={{ height: 19, width: 19, borderColor: "#F84B01", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
+                  <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "#F84B01", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
                   <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
                 </View>
                 <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -186,7 +208,7 @@ function Goal({ navigation, route }) {
               return (
                 <View key={pen}>
                   <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                    <Checkbox  status={"checked"} style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
+                    <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
                     <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                   </View>
                   <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -222,7 +244,7 @@ function Goal({ navigation, route }) {
               return (
                 <View key={pen} >
                   <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                    <Checkbox  status={"checked"} style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
+                    <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
                     <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                   </View>
                   <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -287,29 +309,86 @@ function Search() {
 }
 
 export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
+  const { user, error } = useSelector((state: ApplicationState) => state.userReducer);
+  const { token } = user;
+  useEffect(() => {
+    if (token !== undefined) {
+      dispatch(onUserData(token));
+    };
+    if (token == undefined) {
+      console.log("Token: ", token);
+      console.log(user);
+    };
+    if (token == undefined) {
+      reload();
+    };
+    //do nothing
+  }, [user, error]);
+
+  const dispatch = useDispatch();
+  const reload = () => {
+    AsyncStorage.getItem('account')
+      .then(userString => {
+        dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
+      })
+      .catch(err => {
+        console.log(err);
+      });
+    // dispatch(onLogin(email, password));
+  };
+
   const [firstText, setFirstText] = useState('');
   const [secondText, setSecondText] = useState('core goal.');
   const [thirdText, setThirdText] = useState('Activities added here are most likely to lead to closing buisness and reach sales goals.');
   const [first, setFirst] = useState('#48B0B1');
   const [second, setSecond] = useState('white');
   const [third, setThird] = useState('white');
-  
+
+  const addNewGoal = () => {
+    // axios.post(`${BASE_URL}goals/objectives.json`,{method: 'post',headers: {'token': token},data : {okr_objective: {'name': firstText , 'category': "core"}}})
+    // .then( res => {
+    //   console.log(res.data);
+    // }, (error) => {
+    //   console.log(error);
+    // });
+    const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": "core" } });
+
+    const config = {
+      method: 'post',
+      url: `${BASE_URL}goals/objectives.json`,
+      headers: {
+        'token': token,
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
+
+    axios(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+
   const select = (x) => {
-    if(x == "first"){
+    if (x == "first") {
       setFirst("#48B0B1")
       setSecond("white")
       setThird("white")
       setSecondText("core goal.")
       setThirdText("Activities added here are most likely to lead to closing buisness and reach sales goals.")
     }
-    if(x == "second"){
+    if (x == "second") {
       setFirst("white")
       setSecond("#48B0B1")
       setThird("white")
       setSecondText("context goal.")
       setThirdText("Activities that are added here are necessary but do not directly lead to closing more business or reaching sales goals.")
     }
-    if(x == "third"){
+    if (x == "third") {
       setFirst("white")
       setSecond("white")
       setThird("#48B0B1")
@@ -352,8 +431,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
         <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20, marginTop: "6%" }}>{thirdText}</Text>
       </View>
-      <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "5%", marginLeft: "5%", marginRight: "5%", borderRadius: 14,  justifyContent: 'center', alignItems: 'center' }} >
-          <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create goal</Text>
+      <TouchableOpacity onPress={addNewGoal} style={{ backgroundColor: "#47AFB0", padding: "5%", marginLeft: "5%", marginRight: "5%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
+        <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create goal</Text>
       </TouchableOpacity>
     </View>
   );
