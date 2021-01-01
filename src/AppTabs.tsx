@@ -7,7 +7,7 @@ import { AuthContext } from './AuthProvider';
 import Moticon from '../customIcon';
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState, onLogin, onUserData } from '../src/redux';
-import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, SimpleLineIcons, Ionicons, Octicons, FontAwesome, EvilIcons } from '@expo/vector-icons';
+import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, SimpleLineIcons, Ionicons, FontAwesome, EvilIcons, Feather } from '@expo/vector-icons';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -15,7 +15,7 @@ import { Checkbox } from 'react-native-paper';
 import AsyncStorage from '@react-native-community/async-storage';
 import { BASE_URL } from './utils';
 import axios from 'axios';
-import { AntDesign } from '@expo/vector-icons'; 
+import { AntDesign } from '@expo/vector-icons';
 
 interface AppTabsProps {
   store: any
@@ -63,15 +63,29 @@ function GoalsList({ sheetRef, navigation }) {
           console.log(elm.activities_pending)
           return (
             <View key={elm} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
-              <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
-                <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%" }} />
-                <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
-              </TouchableOpacity>
+              {elm.category == "core" ?
+                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
+                  <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%" }} />
+                  <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
+                </TouchableOpacity>
+                : null}
+              {elm.category == "context" ?
+                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
+                  <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
+                </TouchableOpacity>
+                : null}
+              {elm.category == "healthy_habits" ?
+                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
+                  <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%" }} />
+                  <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
+                </TouchableOpacity>
+                : null}
               <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
                 <View style={{ backgroundColor: "#D1EBEC", height: 5, width: "35%", borderRadius: 5, marginRight: "3%" }}>
                   <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${elm.completion}%`, borderRadius: 5 }} />
                 </View>
                 <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{elm.completion}%</Text>
+
               </View>
               {elm.activities_pending.map(pen => {
                 console.log(pen)
@@ -132,30 +146,28 @@ function GoalsList({ sheetRef, navigation }) {
           )
         })}
       </ScrollView>
-      {/* <TouchableOpacity style={{ backgroundColor: "#48B0B1", height: 60, width: 60, borderRadius: 100, justifyContent: "center", alignItems: "center", zIndex: 1, alignSelf: "flex-end", marginBottom: "5%", marginRight: "5%" }} onPress={() => { sheetRef.current.snapTo(0); console.log(userGoals); }}>
-        <Octicons name="plus-small" size={60} color="white" />
-      </TouchableOpacity> */}
       <AntDesign name="pluscircle" size={64} color="black" style={{
-      width: 80,  
-      height: 80,   
-      borderRadius: 30,            
-      position: 'absolute',                                          
-      bottom: 10,                                                    
-      right: 10,
-      color: "#48B0B1" }}
-      onPress={() => { sheetRef.current.snapTo(0); console.log(userGoals); }}/>
+        width: 80,
+        height: 80,
+        borderRadius: 30,
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        color: "#48B0B1"
+      }}
+        onPress={() => sheetRef.current.snapTo(0)} />
     </SafeAreaView>
   )
 }
 
-function Goal({ navigation, route }) {
+function Goal({ navigation, route, updateRef, activityRef }) {
   const { goal } = route.params;
   console.log(goal);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ height: "10%", alignItems: "center", flexDirection: "row", justifyContent: "space-between", paddingLeft: "6%", paddingRight: "6%" }}>
         <Ionicons name="ios-arrow-back" size={40} color="grey" onPress={() => { navigation.navigate('GoalsList') }} />
-        <MaterialCommunityIcons name="settings" size={33} color="grey" />
+        <MaterialCommunityIcons name="settings" size={33} color="grey" onPress={() => updateRef.current.snapTo(0)} />
       </View>
       <View style={{ paddingLeft: "5%", paddingRight: "3%", marginTop: "3%" }} >
         <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><Fontisto name="star" size={35} color="#FFC756" style={{ marginRight: "10%" }} /> {goal.name}</Text>
@@ -273,18 +285,30 @@ function Goal({ navigation, route }) {
           </View>
           : null}
       </ScrollView>
+      <AntDesign name="pluscircle" size={64} color="black" style={{
+        width: 80,
+        height: 80,
+        borderRadius: 30,
+        position: 'absolute',
+        bottom: 10,
+        right: 10,
+        color: "#48B0B1"
+      }}
+        onPress={() => activityRef.current.snapTo(0)} />
     </SafeAreaView>
   )
 }
 
-function GoalsTab({ sheetRef }) {
+function GoalsTab({ sheetRef, updateRef, activityRef }) {
   const GoalsStack = createStackNavigator();
   return (
     <GoalsStack.Navigator initialRouteName="GoalsList">
       <GoalsStack.Screen name="GoalsList" options={{ header: () => null }} >
         {(props) => <GoalsList  {...props} sheetRef={sheetRef} />}
       </GoalsStack.Screen>
-      <GoalsStack.Screen name="Goal" options={{ header: () => null }} component={Goal} />
+      <GoalsStack.Screen name="Goal" options={{ header: () => null }} >
+        {(props) => <Goal  {...props} updateRef={updateRef} activityRef={activityRef} />}
+      </GoalsStack.Screen>
     </GoalsStack.Navigator>
   );
 }
@@ -397,6 +421,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     }
   };
   const sheetRef = React.useRef(null);
+  const updateRef = React.useRef(null);
+  const activityRef = React.useRef(null);
 
   const renderContent = () => (
     <View style={{ backgroundColor: 'white', height: "100%" }}>
@@ -437,6 +463,93 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     </View>
   );
 
+  const updateContent = () => (
+    <View style={{ backgroundColor: 'white', height: "100%" }}>
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
+        <Entypo name="cross" size={40} color="black" onPress={() => updateRef.current.snapTo(2)} />
+        <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Update goal</Text>
+        <View style={{ width: "14%" }} />
+      </View>
+      <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={true}>
+        <SafeAreaView>
+          <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
+          <TextInput multiline={true} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0 }} />
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "10%", width: "100%" }}>
+            <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+              <FontAwesome name="star" size={18} color="black" />
+              <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> CORE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => select("second")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: second, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+              <EvilIcons name="star" size={23} color="black" />
+              <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>CONTEXT</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+              <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
+              <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>HEALTHY HABITS</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={{ margin: "5%", backgroundColor: "#D0EBEA", borderRadius: 10, height: "30%", padding: "5%" }}>
+            <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20 }}>This is a <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>{secondText}</Text></Text>
+            <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20, marginTop: "6%" }}>{thirdText}</Text>
+          </View>
+
+          <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", marginBottom: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
+            <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Update goal</Text>
+          </TouchableOpacity>
+
+          <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", alignSelf: "center", marginBottom: "5%" }}>
+            <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "9%", paddingRight: "2%", paddingLeft: "2%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
+              <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Mark completed <Feather name="check" size={24} color="white" /></Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "13%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
+              <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Share</Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={{ borderColor: "#F97459", borderWidth: 3, padding: "4%", marginLeft: "5%", marginRight: "5%", marginBottom: "10%", marginTop: 1, borderRadius: 14, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: "#F97459", fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>Remove</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </ScrollView>
+    </View>
+  );
+
+  const activityContent = () => (
+    <View style={{ backgroundColor: 'white', height: "100%" }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
+        <Entypo name="cross" size={40} color="black" onPress={() => activityRef.current.snapTo(2)} />
+        <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Add new activity</Text>
+        <View style={{ width: "14%" }} />
+      </View>
+      <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Activity</Text>
+      <TextInput
+        multiline={true}
+        numberOfLines={4}
+        onChangeText={setFirstText}
+        style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "20%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }}
+        placeholder="What is the activity for this objective?"
+      />
+      <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "100%" }}>
+        <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+          <FontAwesome name="star" size={18} color="black" />
+          <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY IS RECURRING</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+          <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
+          <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>ACTIVITY HAS A DEADLINE</Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%" }}>How often would you like to complete this activity?</Text>
+      <View style={{ margin: "5%", borderColor: 'black', borderWidth: 1, height: "10%", padding: "5%", marginBottom: "20%" }} />
+      <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", marginBottom: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
+        <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create activity</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+
   return (
     <View style={{ flex: 1 }}>
       <Tabs.Navigator
@@ -466,7 +579,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               <Moticon name='Bullseye-Pointer' size={30} color={color} />
             ),
           }}>
-          {(props) => <GoalsTab  {...props} sheetRef={sheetRef} />}
+          {(props) => <GoalsTab  {...props} sheetRef={sheetRef} updateRef={updateRef} activityRef={activityRef} />}
         </Tabs.Screen>
         <Tabs.Screen
           name='ActionPlans'
@@ -500,7 +613,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
           component={Search}
           options={{
             tabBarLabel: LeaderBoard,
-            tabBarIcon: ({ color, size }) => (
+            tabBarIcon: ({ color }) => (
               <Moticon name='LeaderBoard' size={30} color={color} />
             ),
           }} />
@@ -513,7 +626,28 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
       />
+      <BottomSheet
+        ref={updateRef}
+        snapPoints={["85%", 0, 0]}
+        renderContent={updateContent}
+        initialSnap={2}
+        enabledGestureInteraction={true}
+        enabledContentTapInteraction={false}
+      />
+      <BottomSheet
+        ref={activityRef}
+        snapPoints={["85%", 0, 0]}
+        renderContent={activityContent}
+        initialSnap={2}
+        enabledGestureInteraction={true}
+        enabledContentTapInteraction={false}
+      />
     </View>
   );
 }
 
+const styles = StyleSheet.create({
+  contentContainer: {
+    height: 820
+  }
+});
