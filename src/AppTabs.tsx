@@ -531,7 +531,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "20%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }}
         placeholder="What is the activity for this objective?"
       />
-      <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "100%" }}>
+      <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "70%", alignSelf: "center" }}>
         <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
           <FontAwesome name="star" size={18} color="black" />
           <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY IS RECURRING</Text>
@@ -542,8 +542,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         </TouchableOpacity>
       </View>
       <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%" }}>How often would you like to complete this activity?</Text>
-      <View style={{ margin: "5%", borderColor: 'black', borderWidth: 1, height: "10%", padding: "5%", marginBottom: "20%" }} />
-      <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", marginBottom: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
+      <View style={{ margin: "5%", borderColor: 'black', borderWidth: 1, height: "10%", padding: "5%", marginBottom: "10%" }} />
+      <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
         <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create activity</Text>
       </TouchableOpacity>
     </View>
