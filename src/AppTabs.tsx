@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AppParamList } from './AppParamList';
 import { Center } from './Center';
-import { StyleSheet, Button, Text, View, SafeAreaView, TextInput } from "react-native";
+import { StyleSheet, Button, Text, View, SafeAreaView, TextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { AuthContext } from './AuthProvider';
 import Moticon from '../customIcon';
 import { useSelector, useDispatch } from 'react-redux';
@@ -53,16 +53,12 @@ function GoalsList({ sheetRef, navigation }) {
       <View style={{ height: "15%", flexDirection: "row", paddingLeft: "6%", alignItems: "flex-end", paddingBottom: "3%" }}>
         <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
         <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
-        <Button
-          title="Reload"
-          onPress={reload}
-        />
+        {/* <Button title="Reload" onPress={reload} /> */}
       </View>
       <ScrollView style={{ width: "100%" }}>
         {goals.map(elm => {
-          console.log(elm.activities_pending)
           return (
-            <View key={elm} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
+            <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
               {elm.category == "core" ?
                 <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
                   <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%" }} />
@@ -88,7 +84,6 @@ function GoalsList({ sheetRef, navigation }) {
 
               </View>
               {elm.activities_pending.map(pen => {
-                console.log(pen)
                 return (
                   <View key={pen}>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
@@ -162,15 +157,22 @@ function GoalsList({ sheetRef, navigation }) {
 
 function Goal({ navigation, route, updateRef, activityRef }) {
   const { goal } = route.params;
-  console.log(goal);
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ height: "10%", alignItems: "center", flexDirection: "row", justifyContent: "space-between", paddingLeft: "6%", paddingRight: "6%" }}>
+      <View key={goal.id} style={{ height: "10%", alignItems: "center", flexDirection: "row", justifyContent: "space-between", paddingLeft: "6%", paddingRight: "6%" }}>
         <Ionicons name="ios-arrow-back" size={40} color="grey" onPress={() => { navigation.navigate('GoalsList') }} />
         <MaterialCommunityIcons name="settings" size={33} color="grey" onPress={() => updateRef.current.snapTo(0)} />
       </View>
       <View style={{ paddingLeft: "5%", paddingRight: "3%", marginTop: "3%" }} >
-        <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><Fontisto name="star" size={35} color="#FFC756" style={{ marginRight: "10%" }} /> {goal.name}</Text>
+        {goal.category == "core" ?
+          <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><Fontisto name="star" size={35} color="#FFC756" style={{ marginRight: "10%" }} /> {goal.name}</Text>
+          : null}
+        {goal.category == "context" ?
+          <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}>{goal.name}</Text>
+          : null}
+        {goal.category == "healthy_habits" ?
+          <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><FontAwesome5 name="apple-alt" size={35} color="#48B0B1" style={{ marginRight: "10%" }} /> {goal.name}</Text>
+          : null}
       </View>
       <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", marginTop: "3%" }}>
         <View style={{ backgroundColor: "#D1EBEC", height: 6, width: "35%", borderRadius: 5, marginRight: "3%" }}>
@@ -180,11 +182,10 @@ function Goal({ navigation, route, updateRef, activityRef }) {
       </View>
       <ScrollView style={{ width: "100%" }}>
         <View style={{ marginBottom: "5%" }}>
-          <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
           {goal.activities_overdue.map(pen => {
-            console.log(pen)
             return (
               <View key={pen}>
+                <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
                 <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
                   <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "#F84B01", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
                   <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
@@ -216,7 +217,6 @@ function Goal({ navigation, route, updateRef, activityRef }) {
         {goal.activities_pending.length > 0 ?
           <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingTop: "5%", marginBottom: "5%" }}>
             {goal.activities_pending.map(pen => {
-              console.log(pen)
               return (
                 <View key={pen}>
                   <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
@@ -252,7 +252,6 @@ function Goal({ navigation, route, updateRef, activityRef }) {
           <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, opacity: 0.5 }}>
             <Text style={{ fontSize: 16, fontFamily: "OpenSans_700Bold", width: "90%", color: "black", paddingLeft: "5%", paddingTop: "5%" }}>COMPLETED ACTIVITIES</Text>
             {goal.activities_finished.map(pen => {
-              console.log(pen)
               return (
                 <View key={pen} >
                   <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
@@ -335,15 +334,13 @@ function Search() {
 export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const { user, error } = useSelector((state: ApplicationState) => state.userReducer);
   const { token } = user;
+
   useEffect(() => {
     if (token !== undefined) {
       dispatch(onUserData(token));
     };
     if (token == undefined) {
       console.log("Token: ", token);
-      console.log(user);
-    };
-    if (token == undefined) {
       reload();
     };
     //do nothing
@@ -353,7 +350,11 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const reload = () => {
     AsyncStorage.getItem('account')
       .then(userString => {
-        dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
+        if(userString !== null){
+          dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
+        }else{
+          
+        }
       })
       .catch(err => {
         console.log(err);
@@ -364,6 +365,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const [firstText, setFirstText] = useState('');
   const [secondText, setSecondText] = useState('core goal.');
   const [thirdText, setThirdText] = useState('Activities added here are most likely to lead to closing buisness and reach sales goals.');
+  const [categoryText, setCategoryText] = useState('core');
   const [first, setFirst] = useState('#48B0B1');
   const [second, setSecond] = useState('white');
   const [third, setThird] = useState('white');
@@ -375,7 +377,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     // }, (error) => {
     //   console.log(error);
     // });
-    const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": "core" } });
+    const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": categoryText } });
 
     const config = {
       method: 'post',
@@ -394,6 +396,12 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       .catch((error) => {
         console.log(error);
       });
+
+    alert("A new goal has been added.");
+
+    sheetRef.current.snapTo(2);
+
+    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
   };
 
 
@@ -403,6 +411,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       setSecond("white")
       setThird("white")
       setSecondText("core goal.")
+      setCategoryText("core")
       setThirdText("Activities added here are most likely to lead to closing buisness and reach sales goals.")
     }
     if (x == "second") {
@@ -410,6 +419,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       setSecond("#48B0B1")
       setThird("white")
       setSecondText("context goal.")
+      setCategoryText("context")
       setThirdText("Activities that are added here are necessary but do not directly lead to closing more business or reaching sales goals.")
     }
     if (x == "third") {
@@ -417,6 +427,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       setSecond("white")
       setThird("#48B0B1")
       setSecondText("healthy habit goal.")
+      setCategoryText("healthy_habits")
       setThirdText("Activities that are added here are crucial for keeping your mental and physical health in check, empowering you to achieve your professional goals.")
     }
   };
@@ -425,128 +436,133 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const activityRef = React.useRef(null);
 
   const renderContent = () => (
-    <View style={{ backgroundColor: 'white', height: "100%" }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
-        <Entypo name="cross" size={40} color="black" onPress={() => sheetRef.current.snapTo(2)} />
-        <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Add new goal</Text>
-        <View style={{ width: "14%" }} />
-      </View>
-      <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
-      <TextInput
-        multiline={true}
-        numberOfLines={4}
-        onChangeText={setFirstText}
-        style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0 }}
-      />
-      <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "12%", width: "100%" }}>
-        <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-          <FontAwesome name="star" size={18} color="black" />
-          <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> CORE</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => select("second")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: second, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-          <EvilIcons name="star" size={23} color="black" />
-          <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>CONTEXT</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-          <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
-          <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>HEALTHY HABITS</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={{ margin: "5%", backgroundColor: "#D0EBEA", borderRadius: 10, height: "30%", padding: "5%" }}>
-        <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20 }}>This is a <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>{secondText}</Text></Text>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={{ backgroundColor: 'white', height: "100%" }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
+          <Entypo name="cross" size={40} color="black" onPress={() => sheetRef.current.snapTo(2)} />
+          <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Add new goal</Text>
+          <View style={{ width: "14%" }} />
+        </View>
+        <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
+        <TextInput
+          multiline={true}
+          numberOfLines={4}
+          onChangeText={setFirstText}
+          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0 }}
+        />
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "12%", width: "100%" }}>
+          <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+            <FontAwesome name="star" size={18} color="black" />
+            <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> CORE</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => select("second")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: second, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+            <EvilIcons name="star" size={23} color="black" />
+            <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>CONTEXT</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+            <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
+            <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>HEALTHY HABITS</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ margin: "5%", backgroundColor: "#D0EBEA", borderRadius: 10, height: "30%", padding: "5%" }}>
+          <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20 }}>This is a <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>{secondText}</Text></Text>
 
-        <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20, marginTop: "6%" }}>{thirdText}</Text>
+          <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20, marginTop: "6%" }}>{thirdText}</Text>
+        </View>
+        <TouchableOpacity onPress={addNewGoal} style={{ backgroundColor: "#47AFB0", padding: "5%", marginLeft: "5%", marginRight: "5%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
+          <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create goal</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={addNewGoal} style={{ backgroundColor: "#47AFB0", padding: "5%", marginLeft: "5%", marginRight: "5%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
-        <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create goal</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 
   const updateContent = () => (
-    <View style={{ backgroundColor: 'white', height: "100%" }}>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={{ backgroundColor: 'white', height: "100%" }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
+          <Entypo name="cross" size={40} color="black" onPress={() => updateRef.current.snapTo(2)} />
+          <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Update goal</Text>
+          <View style={{ width: "14%" }} />
+        </View>
+        <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={true}>
+          <SafeAreaView>
+            <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
+            <TextInput multiline={true} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0 }} />
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "10%", width: "100%" }}>
+              <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+                <FontAwesome name="star" size={18} color="black" />
+                <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> CORE</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => select("second")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: second, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+                <EvilIcons name="star" size={23} color="black" />
+                <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>CONTEXT</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
+                <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
+                <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>HEALTHY HABITS</Text>
+              </TouchableOpacity>
+            </View>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
-        <Entypo name="cross" size={40} color="black" onPress={() => updateRef.current.snapTo(2)} />
-        <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Update goal</Text>
-        <View style={{ width: "14%" }} />
+            <View style={{ margin: "5%", backgroundColor: "#D0EBEA", borderRadius: 10, height: "30%", padding: "5%" }}>
+              <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20 }}>This is a <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>{secondText}</Text></Text>
+              <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20, marginTop: "6%" }}>{thirdText}</Text>
+            </View>
+
+            <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", marginBottom: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
+              <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Update goal</Text>
+            </TouchableOpacity>
+
+            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", alignSelf: "center", marginBottom: "5%" }}>
+              <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "9%", paddingRight: "2%", paddingLeft: "2%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
+                <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Mark completed <Feather name="check" size={24} color="white" /></Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "13%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
+                <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Share</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={{ borderColor: "#F97459", borderWidth: 3, padding: "4%", marginLeft: "5%", marginRight: "5%", marginBottom: "10%", marginTop: 1, borderRadius: 14, justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{ color: "#F97459", fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>Remove</Text>
+            </TouchableOpacity>
+          </SafeAreaView>
+        </ScrollView>
       </View>
-      <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={true}>
-        <SafeAreaView>
-          <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
-          <TextInput multiline={true} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0 }} />
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "10%", width: "100%" }}>
-            <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-              <FontAwesome name="star" size={18} color="black" />
-              <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> CORE</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => select("second")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: second, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-              <EvilIcons name="star" size={23} color="black" />
-              <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>CONTEXT</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-              <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
-              <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>HEALTHY HABITS</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={{ margin: "5%", backgroundColor: "#D0EBEA", borderRadius: 10, height: "30%", padding: "5%" }}>
-            <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20 }}>This is a <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>{secondText}</Text></Text>
-            <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20, marginTop: "6%" }}>{thirdText}</Text>
-          </View>
-
-          <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", marginBottom: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
-            <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Update goal</Text>
-          </TouchableOpacity>
-
-          <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", alignSelf: "center", marginBottom: "5%" }}>
-            <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "9%", paddingRight: "2%", paddingLeft: "2%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
-              <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Mark completed <Feather name="check" size={24} color="white" /></Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "13%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
-              <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Share</Text>
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity style={{ borderColor: "#F97459", borderWidth: 3, padding: "4%", marginLeft: "5%", marginRight: "5%", marginBottom: "10%", marginTop: 1, borderRadius: 14, justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={{ color: "#F97459", fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>Remove</Text>
-          </TouchableOpacity>
-        </SafeAreaView>
-      </ScrollView>
-    </View>
+    </TouchableWithoutFeedback>
   );
 
   const activityContent = () => (
-    <View style={{ backgroundColor: 'white', height: "100%" }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
-        <Entypo name="cross" size={40} color="black" onPress={() => activityRef.current.snapTo(2)} />
-        <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Add new activity</Text>
-        <View style={{ width: "14%" }} />
-      </View>
-      <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Activity</Text>
-      <TextInput
-        multiline={true}
-        numberOfLines={4}
-        onChangeText={setFirstText}
-        style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "20%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }}
-        placeholder="What is the activity for this objective?"
-      />
-      <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "70%", alignSelf: "center" }}>
-        <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
-          <FontAwesome name="star" size={18} color="black" />
-          <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY IS RECURRING</Text>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <View style={{ backgroundColor: 'white', height: "100%" }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
+          <Entypo name="cross" size={40} color="black" onPress={() => activityRef.current.snapTo(2)} />
+          <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Add new activity</Text>
+          <View style={{ width: "14%" }} />
+        </View>
+        <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Activity</Text>
+        <TextInput
+          multiline={true}
+          numberOfLines={4}
+          onChangeText={setFirstText}
+          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "20%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }}
+          placeholder="What is the activity for this objective?"
+        />
+        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "70%", alignSelf: "center" }}>
+          <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+            <Entypo name="cycle" size={19} color="black" />
+            <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY IS RECURRING</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+            <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
+            <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY HAS A DEADLINE</Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%" }}>How often would you like to complete this activity?</Text>
+        <TouchableOpacity style={{ margin: "5%", borderColor: 'black', borderWidth: 1, padding: "10%", height: "15%" }} />
+        <TouchableOpacity style={{ backgroundColor: "#FCC755", alignContent: "center", width: "90%", padding: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center', alignSelf: "center", }} >
+          <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create activity</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
-          <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
-          <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>ACTIVITY HAS A DEADLINE</Text>
-        </TouchableOpacity>
       </View>
-      <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%" }}>How often would you like to complete this activity?</Text>
-      <View style={{ margin: "5%", borderColor: 'black', borderWidth: 1, height: "10%", padding: "5%", marginBottom: "10%" }} />
-      <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
-        <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create activity</Text>
-      </TouchableOpacity>
-    </View>
+    </TouchableWithoutFeedback>
   );
 
 
@@ -631,7 +647,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         snapPoints={["85%", 0, 0]}
         renderContent={updateContent}
         initialSnap={2}
-        enabledGestureInteraction={true}
+        // enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
       />
       <BottomSheet

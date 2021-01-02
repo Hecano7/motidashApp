@@ -20,7 +20,7 @@ export const Routes: React.FC<RoutesProps> = ({}) => {
   
   useEffect(() => {
     // check if user is loged in
-    AsyncStorage.getItem('user')
+    AsyncStorage.getItem('account')
     .then(userString => {
       if (userString) {
         // decode it
