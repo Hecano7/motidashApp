@@ -11,7 +11,6 @@ import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, SimpleLineIcons
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import BottomSheet from 'reanimated-bottom-sheet';
-import { Checkbox } from 'react-native-paper';
 import AsyncStorage from '@react-native-community/async-storage';
 import { BASE_URL } from './utils';
 import axios from 'axios';
@@ -38,9 +37,11 @@ function GoalsList({ sheetRef, navigation }) {
   const { token } = user;
   const [goals, goalsRecieved] = useState([]);
   const { userGoals, error } = useSelector((state: ApplicationState) => state.loadUserDataReducer);
+  
   const reload = () => {
     dispatch(onUserData(token));
   };
+
   useEffect(() => {
     console.log(userGoals);
     if ((userGoals[0] !== undefined)) {
@@ -85,10 +86,10 @@ function GoalsList({ sheetRef, navigation }) {
               </View>
               {elm.activities_pending.map(pen => {
                 return (
-                  <View key={pen}>
+                  <View key={pen.id}>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                      <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
-                      <Text style={{ fontSize: 21, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
+                    <Fontisto name="checkbox-passive" size={30} color="black" style={{marginRight:"2%"}}/>
+                    <Text style={{ fontSize: 21, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
                     </View>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                       {pen.points > 0 ?
@@ -184,12 +185,12 @@ function Goal({ navigation, route, updateRef, activityRef }) {
         <View style={{ marginBottom: "5%" }}>
           {goal.activities_overdue.map(pen => {
             return (
-              <View key={pen}>
+              <View key={pen.id}>
                 <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
-                <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                  <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "#F84B01", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
+                <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{marginRight:"2%"}}/>
                   <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
-                </View>
+                </TouchableOpacity>
                 <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                   {pen.points > 0 ?
                     <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
@@ -218,11 +219,11 @@ function Goal({ navigation, route, updateRef, activityRef }) {
           <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingTop: "5%", marginBottom: "5%" }}>
             {goal.activities_pending.map(pen => {
               return (
-                <View key={pen}>
-                  <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                    <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
+                <View key={pen.id}>
+                  <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                  <Fontisto name="checkbox-passive" size={30} color="black" style={{marginRight:"2%"}}/>
                     <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
-                  </View>
+                  </TouchableOpacity>
                   <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                     {pen.points > 0 ?
                       <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
@@ -253,9 +254,9 @@ function Goal({ navigation, route, updateRef, activityRef }) {
             <Text style={{ fontSize: 16, fontFamily: "OpenSans_700Bold", width: "90%", color: "black", paddingLeft: "5%", paddingTop: "5%" }}>COMPLETED ACTIVITIES</Text>
             {goal.activities_finished.map(pen => {
               return (
-                <View key={pen} >
+                <View key={pen.id} >
                   <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                    <Checkbox status={"checked"} style={{ height: 19, width: 19, borderColor: "black", marginRight: "2%", marginTop: "2%", borderRadius: 2, borderWidth: 1.16 }}></Checkbox>
+                  <AntDesign name="checksquareo" size={30} color="black" style={{marginRight:"2%"}}/>
                     <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                   </View>
                   <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -353,7 +354,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         if(userString !== null){
           dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
         }else{
-          
+
         }
       })
       .catch(err => {
@@ -445,10 +446,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         </View>
         <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
         <TextInput
-          multiline={true}
-          numberOfLines={4}
           onChangeText={setFirstText}
-          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0 }}
+          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }}
         />
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "12%", width: "100%" }}>
           <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
@@ -487,7 +486,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={true}>
           <SafeAreaView>
             <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
-            <TextInput multiline={true} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0 }} />
+            <TextInput multiline={true} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }} />
             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "10%", width: "100%" }}>
               <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
                 <FontAwesome name="star" size={18} color="black" />
@@ -540,13 +539,11 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         </View>
         <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Activity</Text>
         <TextInput
-          multiline={true}
-          numberOfLines={4}
           onChangeText={setFirstText}
-          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "20%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }}
-          placeholder="What is the activity for this objective?"
+          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20, overflow: "scroll" }}
+          placeholder="Add an activity for this objective?"
         />
-        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "70%", alignSelf: "center" }}>
+        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "50%", alignSelf: "center" }}>
           <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
             <Entypo name="cycle" size={19} color="black" />
             <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY IS RECURRING</Text>
@@ -556,8 +553,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
             <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY HAS A DEADLINE</Text>
           </TouchableOpacity>
         </View>
-        <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%" }}>How often would you like to complete this activity?</Text>
-        <TouchableOpacity style={{ margin: "5%", borderColor: 'black', borderWidth: 1, padding: "10%", height: "15%" }} />
+        <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%", height: "10%" }}>How often would you like to complete this activity?</Text>
+        <TouchableOpacity style={{ margin: "5%", borderColor: 'black', borderWidth: 1, padding: "10%", height: "18%" }} />
         <TouchableOpacity style={{ backgroundColor: "#FCC755", alignContent: "center", width: "90%", padding: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center', alignSelf: "center", }} >
           <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create activity</Text>
         </TouchableOpacity>
