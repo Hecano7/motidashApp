@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 import { BASE_URL } from './utils';
 import axios from 'axios';
 import { AntDesign } from '@expo/vector-icons';
+import { Picker } from '@react-native-picker/picker';
 
 interface AppTabsProps {
   store: any
@@ -37,7 +38,7 @@ function GoalsList({ sheetRef, navigation }) {
   const { token } = user;
   const [goals, goalsRecieved] = useState([]);
   const { userGoals, error } = useSelector((state: ApplicationState) => state.loadUserDataReducer);
-  
+
   const reload = () => {
     dispatch(onUserData(token));
   };
@@ -88,8 +89,8 @@ function GoalsList({ sheetRef, navigation }) {
                 return (
                   <View key={pen.id}>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                    <Fontisto name="checkbox-passive" size={30} color="black" style={{marginRight:"2%"}}/>
-                    <Text style={{ fontSize: 21, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
+                      <Fontisto name="checkbox-passive" size={30} color="black" style={{ marginRight: "2%" }} />
+                      <Text style={{ fontSize: 21, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
                     </View>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                       {pen.points > 0 ?
@@ -188,7 +189,7 @@ function Goal({ navigation, route, updateRef, activityRef }) {
               <View key={pen.id}>
                 <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
                 <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{marginRight:"2%"}}/>
+                  <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{ marginRight: "2%" }} />
                   <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
                 </TouchableOpacity>
                 <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -221,7 +222,7 @@ function Goal({ navigation, route, updateRef, activityRef }) {
               return (
                 <View key={pen.id}>
                   <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                  <Fontisto name="checkbox-passive" size={30} color="black" style={{marginRight:"2%"}}/>
+                    <Fontisto name="checkbox-passive" size={30} color="black" style={{ marginRight: "2%" }} />
                     <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                   </TouchableOpacity>
                   <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -256,7 +257,7 @@ function Goal({ navigation, route, updateRef, activityRef }) {
               return (
                 <View key={pen.id} >
                   <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                  <AntDesign name="checksquareo" size={30} color="black" style={{marginRight:"2%"}}/>
+                    <AntDesign name="checksquareo" size={30} color="black" style={{ marginRight: "2%" }} />
                     <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                   </View>
                   <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -351,9 +352,9 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const reload = () => {
     AsyncStorage.getItem('account')
       .then(userString => {
-        if(userString !== null){
+        if (userString !== null) {
           dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
-        }else{
+        } else {
 
         }
       })
@@ -370,6 +371,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const [first, setFirst] = useState('#48B0B1');
   const [second, setSecond] = useState('white');
   const [third, setThird] = useState('white');
+  const [selectedValue, setSelectedValue] = useState("once");
 
   const addNewGoal = () => {
     // axios.post(`${BASE_URL}goals/objectives.json`,{method: 'post',headers: {'token': token},data : {okr_objective: {'name': firstText , 'category': "core"}}})
@@ -554,14 +556,25 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
           </TouchableOpacity>
         </View>
         <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%", height: "10%" }}>How often would you like to complete this activity?</Text>
-        <TouchableOpacity style={{ margin: "5%", borderColor: 'black', borderWidth: 1, padding: "10%", height: "18%" }} />
+        <View style={{ margin: "5%", borderColor: 'black', borderWidth: 1, padding: "20%",paddingTop: 0, alignContent:"center", justifyContent: "center", flex: .2,alignItems: "center", marginBottom: "10%" }}>
+          <Picker
+            selectedValue={selectedValue}
+            style={{ height: 140, width: 150 }}
+            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+          >
+            <Picker.Item label="Once" value="once" />
+            <Picker.Item label="EveryDay" value="everyday" />
+            <Picker.Item label="EveryWeek" value="everyweek" />
+            <Picker.Item label="EveryMonth" value="everymonth" />
+            <Picker.Item label="EveryQuarter" value="everyquarter" />
+          </Picker>
+        </View>
         <TouchableOpacity style={{ backgroundColor: "#FCC755", alignContent: "center", width: "90%", padding: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center', alignSelf: "center", }} >
           <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create activity</Text>
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );
-
 
   return (
     <View style={{ flex: 1 }}>
@@ -644,7 +657,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         snapPoints={["85%", 0, 0]}
         renderContent={updateContent}
         initialSnap={2}
-        // enabledGestureInteraction={true}
+        enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
       />
       <BottomSheet
