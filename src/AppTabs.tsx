@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AppParamList } from './AppParamList';
 import { Center } from './Center';
-import { StyleSheet, Button, Text, View, SafeAreaView, TextInput, TouchableWithoutFeedback, Keyboard , Alert } from "react-native";
+import { StyleSheet, Button, Text, View, SafeAreaView, TextInput, TouchableWithoutFeedback, Keyboard, Alert } from "react-native";
 import { AuthContext } from './AuthProvider';
 import Moticon from '../customIcon';
 import { useSelector, useDispatch } from 'react-redux';
@@ -34,7 +34,7 @@ function LeaderBoard() {
   )
 }
 
-function GoalsList({ sheetRef, navigation , setSelectedGoal}) {
+function GoalsList({ sheetRef, navigation, setSelectedGoal }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state: ApplicationState) => state.userReducer);
   const { token } = user;
@@ -45,7 +45,7 @@ function GoalsList({ sheetRef, navigation , setSelectedGoal}) {
     dispatch(onUserData(token));
   };
 
-  const activityCompleted = (activity,elm) => {
+  const activityCompleted = (activity, elm) => {
     const confirm = () => {
       const config = {
         method: 'get',
@@ -55,15 +55,15 @@ function GoalsList({ sheetRef, navigation , setSelectedGoal}) {
         },
         data: ""
       };
-  
+
       axios(config)
         .then((response) => {
           console.log(JSON.stringify("Response: ", response.data));
         })
         .catch((error) => {
-          console.log("Error: ",error);
+          console.log("Error: ", error);
         });
-  
+
       setTimeout(function () { dispatch(onUserData(token)); }, 3000);
     };
 
@@ -77,11 +77,11 @@ function GoalsList({ sheetRef, navigation , setSelectedGoal}) {
           style: 'cancel',
         },
         {
-          text: 'OK', 
+          text: 'OK',
           onPress: confirm
         },
       ],
-      {cancelable: false},
+      { cancelable: false },
     );
   };
 
@@ -93,46 +93,229 @@ function GoalsList({ sheetRef, navigation , setSelectedGoal}) {
   }, [userGoals, error]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ height: "15%", flexDirection: "row", paddingLeft: "6%", alignItems: "flex-end", paddingBottom: "3%" }}>
-        <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
-        <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
-        <Button title="Reload" onPress={reload} />
-      </View>
-      <ScrollView style={{ width: "100%" }}>
-        {goals.map(elm => {
-          return (
-            <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
-              {elm.category == "core" ?
-                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                  <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%" }} />
-                  <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
-                </TouchableOpacity>
-                : null}
-              {elm.category == "context" ?
-                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                  <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
-                </TouchableOpacity>
-                : null}
-              {elm.category == "healthy_habits" ?
-                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                  <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%" }} />
-                  <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
-                </TouchableOpacity>
-                : null}
-              <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
-                <View style={{ backgroundColor: "#D1EBEC", height: 5, width: "35%", borderRadius: 5, marginRight: "3%" }}>
-                  <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${elm.completion}%`, borderRadius: 5 }} />
-                </View>
-                <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{elm.completion}%</Text>
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ height: "15%", flexDirection: "row", paddingLeft: "6%", alignItems: "flex-end", paddingBottom: "3%" }}>
+          <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
+          <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
+          <Button title="Reload" onPress={reload} />
+        </View>
+        <ScrollView style={{ width: "100%" }}>
+          <View  onStartShouldSetResponder={() => true}>
+          {goals.map(elm => {
+            return (
+              <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
+                {elm.category == "core" ?
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                    <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%" }} />
+                    <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
+                  </TouchableOpacity>
+                  : null}
+                {elm.category == "context" ?
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                    <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
+                  </TouchableOpacity>
+                  : null}
+                {elm.category == "healthy_habits" ?
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                    <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%" }} />
+                    <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
+                  </TouchableOpacity>
+                  : null}
+                <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
+                  <View style={{ backgroundColor: "#D1EBEC", height: 5, width: "35%", borderRadius: 5, marginRight: "3%" }}>
+                    <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${elm.completion}%`, borderRadius: 5 }} />
+                  </View>
+                  <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{elm.completion}%</Text>
 
+                </View>
+                {elm.activities_pending.map(pen => {
+                  return (
+                    <View key={pen.id}>
+                      <TouchableOpacity onPress={() => activityCompleted(pen, elm)} style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                        <Fontisto name="checkbox-passive" size={25} color="black" style={{ marginRight: "2%" }} />
+                        <Text style={{ fontSize: 23, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
+                      </TouchableOpacity>
+                      <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
+                        {pen.points > 0 ?
+                          <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
+                            <FontAwesome5 name="coins" size={14} color="#48B0B1" />
+                            <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "daily" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
+                          </View>
+                          : null}
+                        {pen.deadline_at != null ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> {pen.deadline_at}</Text>
+                          </View>
+                          : null}
+                      </View>
+                    </View>
+                  )
+                })}
+                { elm.activities_overdue.length > 1 ?
+                  <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
+                    <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{elm.activities_overdue.length} OVERDUE ACTIVITIES </Text>
+                    <SimpleLineIcons name="arrow-right" size={15} color="#F84B01" />
+                  </TouchableOpacity>
+                  : null}
+                { elm.activities_overdue.length == 1 ?
+                  <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
+                    <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{elm.activities_overdue.length} OVERDUE ACTIVITY </Text>
+                    <SimpleLineIcons name="arrow-right" size={15} color="#F84B01" />
+                  </TouchableOpacity>
+                  : null}
+                { elm.activities_finished.length > 1 ?
+                  <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
+                    <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}>{elm.activities_finished.length} COMPLETED ACTIVITIES </Text>
+                    <SimpleLineIcons name="arrow-right" size={15} color="black" />
+                  </TouchableOpacity>
+                  : null}
+                { elm.activities_finished.length == 1 ?
+                  <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
+                    <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}>{elm.activities_finished.length} COMPLETED ACTIVITY </Text>
+                    <SimpleLineIcons name="arrow-right" size={15} color="black" />
+                  </TouchableOpacity>
+                  : null}
               </View>
-              {elm.activities_pending.map(pen => {
+            )
+          })}
+          </View>
+        </ScrollView>
+        <AntDesign name="pluscircle" size={64} color="black" style={{
+          width: 80,
+          height: 80,
+          borderRadius: 30,
+          position: 'absolute',
+          bottom: 10,
+          right: 10,
+          color: "#48B0B1"
+        }}
+          onPress={() => sheetRef.current.snapTo(0)} />
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
+  )
+}
+
+function Goal({ navigation, route, updateRef, activityRef }) {
+  const { goal } = route.params;
+  const dispatch = useDispatch();
+  const { user, error } = useSelector((state: ApplicationState) => state.userReducer);
+  const { token } = user;
+
+  const activityCompleted = (activity, elm) => {
+    const confirm = () => {
+      const config = {
+        method: 'get',
+        url: `${BASE_URL}goals/objectives/${elm.id}/activities/${activity.id}/toggle_finished.json`,
+        headers: {
+          'token': token,
+        },
+        data: ""
+      };
+
+      axios(config)
+        .then((response) => {
+          console.log(JSON.stringify("Response: ", response.data));
+        })
+        .catch((error) => {
+          console.log("Error: ", error);
+        });
+
+      setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    };
+
+    Alert.alert(
+      'Checked',
+      'Do you want to check as completed?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK',
+          onPress: confirm
+        },
+      ],
+      { cancelable: false },
+    );
+  };
+
+  return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View key={goal.id} style={{ height: "10%", alignItems: "center", flexDirection: "row", justifyContent: "space-between", paddingLeft: "6%", paddingRight: "6%" }}>
+          <Ionicons name="ios-arrow-back" size={40} color="grey" onPress={() => { navigation.navigate('GoalsList') }} />
+          <MaterialCommunityIcons name="settings" size={33} color="grey" onPress={() => updateRef.current.snapTo(0)} />
+        </View>
+        <View style={{ paddingLeft: "5%", paddingRight: "3%", marginTop: "3%" }} >
+          {goal.category == "core" ?
+            <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><Fontisto name="star" size={35} color="#FFC756" style={{ marginRight: "10%" }} /> {goal.name}</Text>
+            : null}
+          {goal.category == "context" ?
+            <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}>{goal.name}</Text>
+            : null}
+          {goal.category == "healthy_habits" ?
+            <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><FontAwesome5 name="apple-alt" size={35} color="#48B0B1" style={{ marginRight: "10%" }} /> {goal.name}</Text>
+            : null}
+        </View>
+        <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", marginTop: "3%" }}>
+          <View style={{ backgroundColor: "#D1EBEC", height: 6, width: "35%", borderRadius: 5, marginRight: "3%" }}>
+            <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${goal.completion}%`, borderRadius: 5 }} />
+          </View>
+          <Text style={{ fontSize: 15, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{goal.completion}%</Text>
+        </View>
+        <ScrollView style={{ width: "100%" }}>
+          <View  onStartShouldSetResponder={() => true}>
+          <View style={{ marginBottom: "5%" }} onStartShouldSetResponder={() => true}>
+            {goal.activities_overdue.map(pen => {
+              return (
+                <View key={pen.id}>
+                  <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
+                  <TouchableOpacity onPress={() => activityCompleted(pen, goal)} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                    <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{ marginRight: "2%" }} />
+                    <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
+                  </TouchableOpacity>
+                  <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
+                    {pen.points > 0 ?
+                      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
+                        <FontAwesome5 name="coins" size={14} color="#48B0B1" />
+                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_400Regular", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
+                      </View>
+                      : null}
+                    {pen.recurring == "daily" ?
+                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                        <Entypo name="cycle" size={20} color="#F84B01" />
+                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}> DAILY</Text>
+                      </View>
+                      : null}
+                    {pen.deadline_at != null ?
+                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                        <MaterialCommunityIcons name="calendar-month-outline" size={20} color="#F84B01" />
+                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}> {pen.deadline_at}</Text>
+                      </View>
+                      : null}
+                  </View>
+                </View>
+              )
+            })}
+          </View>
+          {goal.activities_pending.length > 0 ?
+            <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingTop: "5%", marginBottom: "5%" }}>
+              {goal.activities_pending.map(pen => {
                 return (
                   <View key={pen.id}>
-                    <TouchableOpacity onPress={() => activityCompleted(pen,elm)} style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                      <Fontisto name="checkbox-passive" size={25} color="black" style={{ marginRight: "2%" }} />
-                      <Text style={{ fontSize: 23, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
+                    <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                      <Fontisto name="checkbox-passive" size={30} color="black" style={{ marginRight: "2%" }} />
+                      <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                       {pen.points > 0 ?
@@ -157,232 +340,57 @@ function GoalsList({ sheetRef, navigation , setSelectedGoal}) {
                   </View>
                 )
               })}
-              { elm.activities_overdue.length > 1 ?
-                <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
-                  <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{elm.activities_overdue.length} OVERDUE ACTIVITIES </Text>
-                  <SimpleLineIcons name="arrow-right" size={15} color="#F84B01" />
-                </TouchableOpacity>
-                : null}
-              { elm.activities_overdue.length == 1 ?
-                <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
-                  <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{elm.activities_overdue.length} OVERDUE ACTIVITY </Text>
-                  <SimpleLineIcons name="arrow-right" size={15} color="#F84B01" />
-                </TouchableOpacity>
-                : null}
-              { elm.activities_finished.length > 1 ?
-                <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
-                  <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}>{elm.activities_finished.length} COMPLETED ACTIVITIES </Text>
-                  <SimpleLineIcons name="arrow-right" size={15} color="black" />
-                </TouchableOpacity>
-                : null}
-              { elm.activities_finished.length == 1 ?
-                <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
-                  <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}>{elm.activities_finished.length} COMPLETED ACTIVITY </Text>
-                  <SimpleLineIcons name="arrow-right" size={15} color="black" />
-                </TouchableOpacity>
-                : null}
             </View>
-          )
-        })}
-      </ScrollView>
-      <AntDesign name="pluscircle" size={64} color="black" style={{
-        width: 80,
-        height: 80,
-        borderRadius: 30,
-        position: 'absolute',
-        bottom: 10,
-        right: 10,
-        color: "#48B0B1"
-      }}
-        onPress={() => sheetRef.current.snapTo(0)} />
-    </SafeAreaView>
-  )
-}
-
-function Goal({ navigation, route, updateRef, activityRef }) {
-  const { goal } = route.params;
-  const dispatch = useDispatch();
-  const { user, error } = useSelector((state: ApplicationState) => state.userReducer);
-  const { token } = user;
-  
-  const activityCompleted = (activity,elm) => {
-    const confirm = () => {
-      const config = {
-        method: 'get',
-        url: `${BASE_URL}goals/objectives/${elm.id}/activities/${activity.id}/toggle_finished.json`,
-        headers: {
-          'token': token,
-        },
-        data: ""
-      };
-  
-      axios(config)
-        .then((response) => {
-          console.log(JSON.stringify("Response: ", response.data));
-        })
-        .catch((error) => {
-          console.log("Error: ",error);
-        });
-  
-      setTimeout(function () { dispatch(onUserData(token)); }, 3000);
-    };
-
-    Alert.alert(
-      'Checked',
-      'Do you want to check as completed?',
-      [
-        {
-          text: 'Cancel',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel',
-        },
-        {
-          text: 'OK', 
-          onPress: confirm
-        },
-      ],
-      {cancelable: false},
-    );
-  };
-
-  return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View key={goal.id} style={{ height: "10%", alignItems: "center", flexDirection: "row", justifyContent: "space-between", paddingLeft: "6%", paddingRight: "6%" }}>
-        <Ionicons name="ios-arrow-back" size={40} color="grey" onPress={() => { navigation.navigate('GoalsList') }} />
-        <MaterialCommunityIcons name="settings" size={33} color="grey" onPress={() => updateRef.current.snapTo(0)} />
-      </View>
-      <View style={{ paddingLeft: "5%", paddingRight: "3%", marginTop: "3%" }} >
-        {goal.category == "core" ?
-          <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><Fontisto name="star" size={35} color="#FFC756" style={{ marginRight: "10%" }} /> {goal.name}</Text>
-          : null}
-        {goal.category == "context" ?
-          <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}>{goal.name}</Text>
-          : null}
-        {goal.category == "healthy_habits" ?
-          <Text style={{ fontSize: 35, fontFamily: "OpenSans_600SemiBold" }}><FontAwesome5 name="apple-alt" size={35} color="#48B0B1" style={{ marginRight: "10%" }} /> {goal.name}</Text>
-          : null}
-      </View>
-      <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", marginTop: "3%" }}>
-        <View style={{ backgroundColor: "#D1EBEC", height: 6, width: "35%", borderRadius: 5, marginRight: "3%" }}>
-          <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${goal.completion}%`, borderRadius: 5 }} />
-        </View>
-        <Text style={{ fontSize: 15, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{goal.completion}%</Text>
-      </View>
-      <ScrollView style={{ width: "100%" }}>
-        <View style={{ marginBottom: "5%" }}>
-          {goal.activities_overdue.map(pen => {
-            return (
-              <View key={pen.id}>
-                <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
-                <TouchableOpacity onPress={() => activityCompleted(pen,goal)} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                  <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{ marginRight: "2%" }} />
-                  <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
-                </TouchableOpacity>
-                <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
-                  {pen.points > 0 ?
-                    <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
-                      <FontAwesome5 name="coins" size={14} color="#48B0B1" />
-                      <Text style={{ fontSize: 14, fontFamily: "OpenSans_400Regular", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
+            : null}
+          {goal.activities_finished.length > 0 ?
+            <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, opacity: 0.5 }}>
+              <Text style={{ fontSize: 16, fontFamily: "OpenSans_700Bold", width: "90%", color: "black", paddingLeft: "5%", paddingTop: "5%" }}>COMPLETED ACTIVITIES</Text>
+              {goal.activities_finished.map(pen => {
+                return (
+                  <View key={pen.id} >
+                    <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                      <AntDesign name="checksquareo" size={30} color="black" style={{ marginRight: "2%" }} />
+                      <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                     </View>
-                    : null}
-                  {pen.recurring == "daily" ?
-                    <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                      <Entypo name="cycle" size={20} color="#F84B01" />
-                      <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}> DAILY</Text>
+                    <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
+                      {pen.points > 0 ?
+                        <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
+                          <FontAwesome5 name="coins" size={14} color="#48B0B1" />
+                          <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
+                        </View>
+                        : null}
+                      {pen.recurring == "daily" ?
+                        <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                          <Entypo name="cycle" size={20} color="black" />
+                          <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
+                        </View>
+                        : null}
+                      {pen.deadline_at != null ?
+                        <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                          <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
+                          <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> {pen.deadline_at}</Text>
+                        </View>
+                        : null}
                     </View>
-                    : null}
-                  {pen.deadline_at != null ?
-                    <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                      <MaterialCommunityIcons name="calendar-month-outline" size={20} color="#F84B01" />
-                      <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}> {pen.deadline_at}</Text>
-                    </View>
-                    : null}
-                </View>
-              </View>
-            )
-          })}
-        </View>
-        {goal.activities_pending.length > 0 ?
-          <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingTop: "5%", marginBottom: "5%" }}>
-            {goal.activities_pending.map(pen => {
-              return (
-                <View key={pen.id}>
-                  <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                    <Fontisto name="checkbox-passive" size={30} color="black" style={{ marginRight: "2%" }} />
-                    <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
-                  </TouchableOpacity>
-                  <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
-                    {pen.points > 0 ?
-                      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
-                        <FontAwesome5 name="coins" size={14} color="#48B0B1" />
-                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
-                      </View>
-                      : null}
-                    {pen.recurring == "daily" ?
-                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <Entypo name="cycle" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
-                      </View>
-                      : null}
-                    {pen.deadline_at != null ?
-                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> {pen.deadline_at}</Text>
-                      </View>
-                      : null}
                   </View>
-                </View>
-              )
-            })}
-          </View>
-          : null}
-        {goal.activities_finished.length > 0 ?
-          <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, opacity: 0.5 }}>
-            <Text style={{ fontSize: 16, fontFamily: "OpenSans_700Bold", width: "90%", color: "black", paddingLeft: "5%", paddingTop: "5%" }}>COMPLETED ACTIVITIES</Text>
-            {goal.activities_finished.map(pen => {
-              return (
-                <View key={pen.id} >
-                  <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                    <AntDesign name="checksquareo" size={30} color="black" style={{ marginRight: "2%" }} />
-                    <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
-                  </View>
-                  <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
-                    {pen.points > 0 ?
-                      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
-                        <FontAwesome5 name="coins" size={14} color="#48B0B1" />
-                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
-                      </View>
-                      : null}
-                    {pen.recurring == "daily" ?
-                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <Entypo name="cycle" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
-                      </View>
-                      : null}
-                    {pen.deadline_at != null ?
-                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> {pen.deadline_at}</Text>
-                      </View>
-                      : null}
-                  </View>
-                </View>
-              )
-            })}
-          </View>
-          : null}
-      </ScrollView>
-      <AntDesign name="pluscircle" size={64} color="black" style={{
-        width: 80,
-        height: 80,
-        borderRadius: 30,
-        position: 'absolute',
-        bottom: 10,
-        right: 10,
-        color: "#48B0B1"
-      }}
-        onPress={() => activityRef.current.snapTo(0)} />
-    </SafeAreaView>
+                )
+              })}
+            </View>
+            : null}
+            </View>
+        </ScrollView>
+        <AntDesign name="pluscircle" size={64} color="black" style={{
+          width: 80,
+          height: 80,
+          borderRadius: 30,
+          position: 'absolute',
+          bottom: 10,
+          right: 10,
+          color: "#48B0B1"
+        }}
+          onPress={() => activityRef.current.snapTo(0)} />
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   )
 }
 
@@ -513,11 +521,11 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         console.log(error);
       });
 
-      alert("A new activity has been added.");
+    alert("A new activity has been added.");
 
-      activityxRef.current.snapTo(2);
-  
-      setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    activityRef.current.snapTo(2);
+
+    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
   };
 
   const select = (x) => {
@@ -679,24 +687,24 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
           </TouchableOpacity>
         </View>
         <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%", height: "10%" }}>How often would you like to complete this activity?</Text>
-        <View style={{ height: "15%", width: "90%", borderColor: 'black', borderWidth: 1,marginTop: "5%", marginBottom: "10%", alignSelf: "center", overflow: "hidden" }}>
-          <TouchableOpacity style={{height: "100%", alignContent: "center"}} onPress={() => {calendarRef.current.snapTo(0); setBackgroundColor('#F2F2F2');}}>
+        <View style={{ height: "15%", width: "90%", borderColor: 'black', borderWidth: 1, marginTop: "5%", marginBottom: "10%", alignSelf: "center", overflow: "hidden" }}>
+          <TouchableOpacity style={{ height: "100%", alignContent: "center" }} onPress={() => { calendarRef.current.snapTo(0); setBackgroundColor('#F2F2F2'); }}>
             {toggle == "recurring" ?
-          <Picker
-            selectedValue={selectedValue}
-            style={{ height: 120, width: "100%", justifyContent: "center" }}
-            onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-          > 
-            <Picker.Item label="" value="" />
-            <Picker.Item label="Everyday" value="everyday" />
-            <Picker.Item label="Every-Week" value="everyweek" />
-            <Picker.Item label="Every-Month" value="everymonth" />
-            <Picker.Item label="Every-Quarter" value="everyquarter" />
-          </Picker> 
-          : null}
-          {toggle == "date" ?
-          <Text style={{alignSelf: "center",marginVertical: "10%", fontWeight: "500", fontSize: 25}}>{selectedStartDate}</Text>
-          : null}
+              <Picker
+                selectedValue={selectedValue}
+                style={{ height: "100%", width: "100%", justifyContent: "center" }}
+                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+              >
+                <Picker.Item label="Once" value="" />
+                <Picker.Item label="Everyday" value="everyday" />
+                <Picker.Item label="Every Week" value="everyweek" />
+                <Picker.Item label="Every Month" value="everymonth" />
+                <Picker.Item label="Every Quarter" value="everyquarter" />
+              </Picker>
+              : null}
+            {toggle == "date" ?
+              <Text style={{ alignSelf: "center", marginVertical: "10%", fontWeight: "500", fontSize: 25, height: "100%" }}>{selectedStartDate}</Text>
+              : null}
           </TouchableOpacity>
         </View>
         <TouchableOpacity onPress={addNewActivity} style={{ backgroundColor: "#FCC755", alignContent: "center", width: "90%", padding: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center', alignSelf: "center", }} >
@@ -707,19 +715,19 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   );
 
   const calendarContent = () => (
-      <View style={{ backgroundColor: 'white', height: "100%"}}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", height: "10%", width: "100%", paddingLeft: "2%",borderBottomColor: '#D8D8D8', borderBottomWidth: 1, }}>
-          <Entypo name="cross" size={40} color="black" onPress={() => {calendarRef.current.snapTo(2); setBackgroundColor('white') }} />
-          <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Calendar</Text>
-          <View style={{ width: "14%" }} />
-        </View>
-        <View  style={{marginTop: "5%"}}>
+    <View style={{ backgroundColor: 'white', height: "100%" }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", height: "15%", width: "100%", paddingLeft: "2%", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, }}>
+        <Entypo name="cross" size={40} color="black" onPress={() => { calendarRef.current.snapTo(2); setBackgroundColor('white') }} />
+        <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Calendar</Text>
+        <View style={{ width: "14%" }} />
+      </View>
+      <View style={{ marginTop: "5%" }}>
         <CalendarPicker
-          onDateChange={(x) => {setSelectedStartDate( x.format("YYYY-MM-DD").toString()); setTimeout(() => {calendarRef.current.snapTo(2);}, 900); setBackgroundColor('white'); console.log(x.format("YYYY-MM-DD").toString())}}
+          onDateChange={(x) => { setSelectedStartDate(x.format("YYYY-MM-DD").toString()); setTimeout(() => { calendarRef.current.snapTo(2); }, 900); setBackgroundColor('white'); console.log(x.format("YYYY-MM-DD").toString()) }}
           width={350}
         />
-        </View>
       </View>
+    </View>
   );
 
   return (

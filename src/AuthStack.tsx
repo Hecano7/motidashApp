@@ -1,6 +1,6 @@
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext, useState, useEffect } from 'react'
-import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView, Dimensions } from 'react-native';
+import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView, Dimensions, TouchableWithoutFeedback } from 'react-native';
 import { AuthParamList } from './AuthParamList';
 import { AuthContext } from './AuthProvider';
 import { Header } from './Header';
@@ -13,6 +13,7 @@ const Stack = createStackNavigator<AuthParamList>();
 
 function StartUp({ navigation }) {
   return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     <View style={styles.container}>
       <View style={styles.first}>
         <Image
@@ -51,6 +52,7 @@ function StartUp({ navigation }) {
         </View>
       </View>
     </View>
+    </TouchableWithoutFeedback>
   )
 };
 
@@ -58,8 +60,8 @@ function Register({ navigation }:
   { navigation: StackNavigationProp<AuthParamList, 'Register'> }) {
 
   return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     <View style={{flex: 1}}>
-
       <Header title="Register your account" navigation={navigation} />
           <View style={{ flex: 4, paddingTop: "2%" }}>
             <View style={{ flex: 1, justifyContent: 'flex-end' }}>
@@ -93,6 +95,7 @@ function Register({ navigation }:
             </View>
           </View>
      </View>
+     </TouchableWithoutFeedback>
   )
 };
 
@@ -128,6 +131,7 @@ function SignIn({ navigation }:
   };
 
   return (
+    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     <View style={{ flex: 1 }}>
       <Header title="Log into your account" navigation={navigation} />
           <View style={{ flex: 4 }}>
@@ -162,6 +166,7 @@ function SignIn({ navigation }:
           </View>
       {load && <ActivityIndicator animating={true} color={"#47AFB0"} style={styles.loading} />}
     </View>
+    </TouchableWithoutFeedback>
   )
 };
 
