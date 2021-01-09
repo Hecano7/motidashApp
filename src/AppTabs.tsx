@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AppParamList } from './AppParamList';
 import { Center } from './Center';
-import { StyleSheet, Button, Text, View, SafeAreaView, TextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { StyleSheet, Button, Text, View, SafeAreaView, TextInput, TouchableWithoutFeedback, Keyboard , Alert } from "react-native";
 import { AuthContext } from './AuthProvider';
 import Moticon from '../customIcon';
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,6 +16,8 @@ import { BASE_URL } from './utils';
 import axios from 'axios';
 import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
+import CalendarPicker from 'react-native-calendar-picker';
+import moment from "moment";
 
 interface AppTabsProps {
   store: any
@@ -32,7 +34,7 @@ function LeaderBoard() {
   )
 }
 
-function GoalsList({ sheetRef, navigation }) {
+function GoalsList({ sheetRef, navigation , setSelectedGoal}) {
   const dispatch = useDispatch();
   const { user } = useSelector((state: ApplicationState) => state.userReducer);
   const { token } = user;
@@ -41,6 +43,46 @@ function GoalsList({ sheetRef, navigation }) {
 
   const reload = () => {
     dispatch(onUserData(token));
+  };
+
+  const activityCompleted = (activity,elm) => {
+    const confirm = () => {
+      const config = {
+        method: 'get',
+        url: `${BASE_URL}goals/objectives/${elm.id}/activities/${activity.id}/toggle_finished.json`,
+        headers: {
+          'token': token,
+        },
+        data: ""
+      };
+  
+      axios(config)
+        .then((response) => {
+          console.log(JSON.stringify("Response: ", response.data));
+        })
+        .catch((error) => {
+          console.log("Error: ",error);
+        });
+  
+      setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    };
+
+    Alert.alert(
+      'Checked',
+      'Do you want to check as completed?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK', 
+          onPress: confirm
+        },
+      ],
+      {cancelable: false},
+    );
   };
 
   useEffect(() => {
@@ -55,25 +97,25 @@ function GoalsList({ sheetRef, navigation }) {
       <View style={{ height: "15%", flexDirection: "row", paddingLeft: "6%", alignItems: "flex-end", paddingBottom: "3%" }}>
         <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
         <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
-        {/* <Button title="Reload" onPress={reload} /> */}
+        <Button title="Reload" onPress={reload} />
       </View>
       <ScrollView style={{ width: "100%" }}>
         {goals.map(elm => {
           return (
             <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
               {elm.category == "core" ?
-                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
+                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                   <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%" }} />
                   <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                 </TouchableOpacity>
                 : null}
               {elm.category == "context" ?
-                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
+                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                   <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
                 </TouchableOpacity>
                 : null}
               {elm.category == "healthy_habits" ?
-                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }) }}>
+                <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                   <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%" }} />
                   <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                 </TouchableOpacity>
@@ -88,10 +130,10 @@ function GoalsList({ sheetRef, navigation }) {
               {elm.activities_pending.map(pen => {
                 return (
                   <View key={pen.id}>
-                    <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                      <Fontisto name="checkbox-passive" size={30} color="black" style={{ marginRight: "2%" }} />
-                      <Text style={{ fontSize: 21, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
-                    </View>
+                    <TouchableOpacity onPress={() => activityCompleted(pen,elm)} style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                      <Fontisto name="checkbox-passive" size={25} color="black" style={{ marginRight: "2%" }} />
+                      <Text style={{ fontSize: 23, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
+                    </TouchableOpacity>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                       {pen.points > 0 ?
                         <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
@@ -159,6 +201,50 @@ function GoalsList({ sheetRef, navigation }) {
 
 function Goal({ navigation, route, updateRef, activityRef }) {
   const { goal } = route.params;
+  const dispatch = useDispatch();
+  const { user, error } = useSelector((state: ApplicationState) => state.userReducer);
+  const { token } = user;
+  
+  const activityCompleted = (activity,elm) => {
+    const confirm = () => {
+      const config = {
+        method: 'get',
+        url: `${BASE_URL}goals/objectives/${elm.id}/activities/${activity.id}/toggle_finished.json`,
+        headers: {
+          'token': token,
+        },
+        data: ""
+      };
+  
+      axios(config)
+        .then((response) => {
+          console.log(JSON.stringify("Response: ", response.data));
+        })
+        .catch((error) => {
+          console.log("Error: ",error);
+        });
+  
+      setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    };
+
+    Alert.alert(
+      'Checked',
+      'Do you want to check as completed?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {
+          text: 'OK', 
+          onPress: confirm
+        },
+      ],
+      {cancelable: false},
+    );
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View key={goal.id} style={{ height: "10%", alignItems: "center", flexDirection: "row", justifyContent: "space-between", paddingLeft: "6%", paddingRight: "6%" }}>
@@ -188,7 +274,7 @@ function Goal({ navigation, route, updateRef, activityRef }) {
             return (
               <View key={pen.id}>
                 <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
-                <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                <TouchableOpacity onPress={() => activityCompleted(pen,goal)} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
                   <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{ marginRight: "2%" }} />
                   <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
                 </TouchableOpacity>
@@ -300,12 +386,12 @@ function Goal({ navigation, route, updateRef, activityRef }) {
   )
 }
 
-function GoalsTab({ sheetRef, updateRef, activityRef }) {
+function GoalsTab({ sheetRef, updateRef, activityRef, setSelectedGoal }) {
   const GoalsStack = createStackNavigator();
   return (
     <GoalsStack.Navigator initialRouteName="GoalsList">
       <GoalsStack.Screen name="GoalsList" options={{ header: () => null }} >
-        {(props) => <GoalsList  {...props} sheetRef={sheetRef} />}
+        {(props) => <GoalsList  {...props} sheetRef={sheetRef} setSelectedGoal={setSelectedGoal} />}
       </GoalsStack.Screen>
       <GoalsStack.Screen name="Goal" options={{ header: () => null }} >
         {(props) => <Goal  {...props} updateRef={updateRef} activityRef={activityRef} />}
@@ -363,7 +449,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       });
     // dispatch(onLogin(email, password));
   };
-
+  // let today = moment().format("MMM Do YY");
+  const [selectedGoal, setSelectedGoal] = useState('');
   const [firstText, setFirstText] = useState('');
   const [secondText, setSecondText] = useState('core goal.');
   const [thirdText, setThirdText] = useState('Activities added here are most likely to lead to closing buisness and reach sales goals.');
@@ -371,15 +458,12 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const [first, setFirst] = useState('#48B0B1');
   const [second, setSecond] = useState('white');
   const [third, setThird] = useState('white');
-  const [selectedValue, setSelectedValue] = useState("once");
+  const [selectedValue, setSelectedValue] = useState("");
+  const [selectedStartDate, setSelectedStartDate] = useState(moment().format("YYYY-MM-DD"));
+  const [backgroundColor, setBackgroundColor] = useState('white');
+  const [toggle, setToggle] = useState('recurring');
 
   const addNewGoal = () => {
-    // axios.post(`${BASE_URL}goals/objectives.json`,{method: 'post',headers: {'token': token},data : {okr_objective: {'name': firstText , 'category': "core"}}})
-    // .then( res => {
-    //   console.log(res.data);
-    // }, (error) => {
-    //   console.log(error);
-    // });
     const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": categoryText } });
 
     const config = {
@@ -407,6 +491,34 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     setTimeout(function () { dispatch(onUserData(token)); }, 3000);
   };
 
+  const addNewActivity = () => {
+    console.log(selectedGoal);
+    const data = `"utf8=%E2%9C%93&okr_activity%5Bname%5D=Complete%20this%20activity&okr_activity%5Brecurring%5D=&okr_activity%5Bdeadline_at%5D=&commit=Create%20activity"`;
+
+    const config = {
+      method: 'post',
+      url: `${BASE_URL}goals/objectives/${selectedGoal}/activities.json`,
+      headers: {
+        'token': token,
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
+
+    axios(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      alert("A new activity has been added.");
+
+      activityxRef.current.snapTo(2);
+  
+      setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+  };
 
   const select = (x) => {
     if (x == "first") {
@@ -433,10 +545,21 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       setCategoryText("healthy_habits")
       setThirdText("Activities that are added here are crucial for keeping your mental and physical health in check, empowering you to achieve your professional goals.")
     }
+    if (x == "fourth") {
+      setFirst("#48B0B1")
+      setThird('white')
+      setToggle("recurring")
+    }
+    if (x == "fith") {
+      setFirst("white")
+      setThird('#48B0B1')
+      setToggle("date")
+    }
   };
   const sheetRef = React.useRef(null);
   const updateRef = React.useRef(null);
   const activityRef = React.useRef(null);
+  const calendarRef = React.useRef(null);
 
   const renderContent = () => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -533,7 +656,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
   const activityContent = () => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-      <View style={{ backgroundColor: 'white', height: "100%" }}>
+      <View style={{ backgroundColor: backgroundColor, height: "100%" }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
           <Entypo name="cross" size={40} color="black" onPress={() => activityRef.current.snapTo(2)} />
           <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Add new activity</Text>
@@ -546,34 +669,57 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
           placeholder="Add an activity for this objective?"
         />
         <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: "12%", width: "50%", alignSelf: "center" }}>
-          <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+          <TouchableOpacity onPress={() => select("fourth")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
             <Entypo name="cycle" size={19} color="black" />
             <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY IS RECURRING</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+          <TouchableOpacity onPress={() => select("fith")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
             <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
             <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY HAS A DEADLINE</Text>
           </TouchableOpacity>
         </View>
         <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%", height: "10%" }}>How often would you like to complete this activity?</Text>
-        <View style={{ margin: "5%", borderColor: 'black', borderWidth: 1, padding: "20%",paddingTop: 0, alignContent:"center", justifyContent: "center", flex: .2,alignItems: "center", marginBottom: "10%" }}>
+        <View style={{ height: "15%", width: "90%", borderColor: 'black', borderWidth: 1,marginTop: "5%", marginBottom: "10%", alignSelf: "center", overflow: "hidden" }}>
+          <TouchableOpacity style={{height: "100%", alignContent: "center"}} onPress={() => {calendarRef.current.snapTo(0); setBackgroundColor('#F2F2F2');}}>
+            {toggle == "recurring" ?
           <Picker
             selectedValue={selectedValue}
-            style={{ height: 140, width: 150 }}
+            style={{ height: 120, width: "100%", justifyContent: "center" }}
             onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-          >
-            <Picker.Item label="Once" value="once" />
-            <Picker.Item label="EveryDay" value="everyday" />
-            <Picker.Item label="EveryWeek" value="everyweek" />
-            <Picker.Item label="EveryMonth" value="everymonth" />
-            <Picker.Item label="EveryQuarter" value="everyquarter" />
-          </Picker>
+          > 
+            <Picker.Item label="" value="" />
+            <Picker.Item label="Everyday" value="everyday" />
+            <Picker.Item label="Every-Week" value="everyweek" />
+            <Picker.Item label="Every-Month" value="everymonth" />
+            <Picker.Item label="Every-Quarter" value="everyquarter" />
+          </Picker> 
+          : null}
+          {toggle == "date" ?
+          <Text style={{alignSelf: "center",marginVertical: "10%", fontWeight: "500", fontSize: 25}}>{selectedStartDate}</Text>
+          : null}
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity style={{ backgroundColor: "#FCC755", alignContent: "center", width: "90%", padding: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center', alignSelf: "center", }} >
+        <TouchableOpacity onPress={addNewActivity} style={{ backgroundColor: "#FCC755", alignContent: "center", width: "90%", padding: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center', alignSelf: "center", }} >
           <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Create activity</Text>
         </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
+  );
+
+  const calendarContent = () => (
+      <View style={{ backgroundColor: 'white', height: "100%"}}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", height: "10%", width: "100%", paddingLeft: "2%",borderBottomColor: '#D8D8D8', borderBottomWidth: 1, }}>
+          <Entypo name="cross" size={40} color="black" onPress={() => {calendarRef.current.snapTo(2); setBackgroundColor('white') }} />
+          <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Calendar</Text>
+          <View style={{ width: "14%" }} />
+        </View>
+        <View  style={{marginTop: "5%"}}>
+        <CalendarPicker
+          onDateChange={(x) => {setSelectedStartDate( x.format("YYYY-MM-DD").toString()); setTimeout(() => {calendarRef.current.snapTo(2);}, 900); setBackgroundColor('white'); console.log(x.format("YYYY-MM-DD").toString())}}
+          width={350}
+        />
+        </View>
+      </View>
   );
 
   return (
@@ -605,7 +751,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               <Moticon name='Bullseye-Pointer' size={30} color={color} />
             ),
           }}>
-          {(props) => <GoalsTab  {...props} sheetRef={sheetRef} updateRef={updateRef} activityRef={activityRef} />}
+          {(props) => <GoalsTab  {...props} sheetRef={sheetRef} updateRef={updateRef} activityRef={activityRef} setSelectedGoal={setSelectedGoal} />}
         </Tabs.Screen>
         <Tabs.Screen
           name='ActionPlans'
@@ -657,6 +803,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         snapPoints={["85%", 0, 0]}
         renderContent={updateContent}
         initialSnap={2}
+        enabledInnerScrolling={true}
+        enabledContentGestureInteraction={true}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
       />
@@ -664,6 +812,14 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         ref={activityRef}
         snapPoints={["85%", 0, 0]}
         renderContent={activityContent}
+        initialSnap={2}
+        enabledGestureInteraction={true}
+        enabledContentTapInteraction={false}
+      />
+      <BottomSheet
+        ref={calendarRef}
+        snapPoints={["55%", 0, 0]}
+        renderContent={calendarContent}
         initialSnap={2}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
