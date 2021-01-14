@@ -1,6 +1,6 @@
 import { createStackNavigator, StackNavigationProp } from '@react-navigation/stack';
 import React, { useContext, useState, useEffect } from 'react'
-import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView, Dimensions, TouchableWithoutFeedback } from 'react-native';
+import { Text, StyleSheet, View, Image, TouchableOpacity, TextInput, ActivityIndicator, ScrollView, Dimensions, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { AuthParamList } from './AuthParamList';
 import { AuthContext } from './AuthProvider';
 import { Header } from './Header';

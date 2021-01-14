@@ -3,6 +3,7 @@ import { Dispatch } from 'react';
 import { BASE_URL } from '../../utils';
 
 export interface UserDataModel {
+  indexOf(goal: any);
   data: any
 }
 
