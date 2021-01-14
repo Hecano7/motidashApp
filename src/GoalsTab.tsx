@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Text, View, SafeAreaView, TouchableWithoutFeedback, Keyboard, Alert, Button } from "react-native";
+import { Text, View, SafeAreaView, TouchableWithoutFeedback, Keyboard, Alert, Button, RefreshControl } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState, onUserData } from '../src/redux';
 import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
@@ -27,6 +27,7 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
     const { goal } = route.params;
     const [goalSelected, goalSelectedRecieved] = useState(goal);
     const { userGoals, error } = useSelector((state: ApplicationState) => state.loadUserDataReducer);
+    const [refreshing, setRefreshing] = React.useState(false);
     
     useEffect(() => {
         if (userGoals) {
@@ -37,13 +38,25 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
             }
         }
     }, [userGoals, error]);
+
+    const wait = (timeout) => {
+      return new Promise(resolve => {
+        setTimeout(resolve, timeout);
+      });
+    }
+
+    const onRefresh = React.useCallback(() => {
+      setRefreshing(true);
+      dispatch(onUserData(token));
+      wait(2000).then(() => setRefreshing(false));
+    }, []);
   
     return (
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <SafeAreaView style={{ flex: 1 }}>
           <View key={goalSelected.id} style={{ height: "10%", alignItems: "center", flexDirection: "row", justifyContent: "space-between", paddingLeft: "6%", paddingRight: "6%" }}>
             <Ionicons name="ios-arrow-back" size={40} color="grey" onPress={() => { navigation.navigate('GoalsList') }} />
-            <MaterialCommunityIcons name="settings" size={33} color="grey" onPress={() => updateRef.current.snapTo(0)} />
+            <MaterialCommunityIcons name="settings" size={33} color="grey" onPress={() => {updateRef.current.snapTo(0);autoPopulateWindow("",goalSelected.id,"goal");}} />
           </View>
           <View style={{ paddingLeft: "5%", paddingRight: "3%", marginTop: "3%" }} >
             {goalSelected.category == "core" ?
@@ -62,7 +75,7 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
             </View>
             <Text style={{ fontSize: 15, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{goalSelected.completion}%</Text>
           </View>
-          <ScrollView style={{ width: "100%" }}>
+          <ScrollView style={{ width: "100%" }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
             <View  onStartShouldSetResponder={() => true}>
             <View style={{ marginBottom: "5%" }} onStartShouldSetResponder={() => true}>
               {goalSelected.activities_overdue.map(pen => {
@@ -241,15 +254,18 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
 interface GoalsListProps {
   sheetRef,
   navigation,
-  setSelectedGoal
+  setSelectedGoal,
+  setGoalTabNav
 }
 
-export const GoalsList: React.FC<GoalsListProps> = ({sheetRef, navigation, setSelectedGoal}) => {
+export const GoalsList: React.FC<GoalsListProps> = ({setGoalTabNav, sheetRef, navigation, setSelectedGoal}) => {
+  setGoalTabNav(navigation);
   const dispatch = useDispatch();
   const { user } = useSelector((state: ApplicationState) => state.userReducer);
   const { token } = user;
   const [goals, goalsRecieved] = useState([]);
   const { userGoals, error } = useSelector((state: ApplicationState) => state.loadUserDataReducer);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   useEffect(() => {
     if ((userGoals[0] !== undefined)) {
@@ -257,10 +273,6 @@ export const GoalsList: React.FC<GoalsListProps> = ({sheetRef, navigation, setSe
       goalsRecieved(JSON.parse(JSON.stringify(userGoals)));
     }
   }, [userGoals, error]);
-  
-  const reload = () => {
-    dispatch(onUserData(token));
-  };
   
   const activityCompleted = (activity, elm) => {
     const confirm = () => {
@@ -302,15 +314,26 @@ export const GoalsList: React.FC<GoalsListProps> = ({sheetRef, navigation, setSe
     );
   };
 
+  const wait = (timeout) => {
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    dispatch(onUserData(token));
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={{ height: "15%", flexDirection: "row", paddingLeft: "6%", alignItems: "flex-end", paddingBottom: "3%" }}>
           <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
           <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
-          <Button title="Reload" onPress={reload} />
         </View>
-        <ScrollView style={{ width: "100%" }}>
+        <ScrollView style={{ width: "100%" }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <View  onStartShouldSetResponder={() => true}>
           {goals.map(elm => {
             return (
