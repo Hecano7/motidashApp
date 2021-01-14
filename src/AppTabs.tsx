@@ -284,23 +284,23 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     console.log(toggle);
 
-    // const config = {
-    //   method: 'patch',
-    //   url: `${BASE_URL}goals/objectives/${selectedGoal}/activities/${selectedActivity}.json`,
-    //   headers: {
-    //     'token': token,
-    //     'Content-Type': 'application/json'
-    //   },
-    //   data: data
-    // };
+    const config = {
+      method: 'patch',
+      url: `${BASE_URL}goals/objectives/${selectedGoal}/activities/${selectedActivity}.json`,
+      headers: {
+        'token': token,
+        'Content-Type': 'application/json'
+      },
+      data: data
+    };
 
-    // axios(config)
-    //   .then((response) => {
-    //     console.log("Response: ", JSON.stringify(response.data));
-    //   })
-    //   .catch((error) => {
-    //     console.log("Error: ", error);
-    //   });
+    axios(config)
+      .then((response) => {
+        console.log("Response: ", JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log("Error: ", error);
+      });
 
     alert("A new activity has been updated.");
 

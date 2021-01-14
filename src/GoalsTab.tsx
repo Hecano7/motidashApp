@@ -339,8 +339,8 @@ export const GoalsList: React.FC<GoalsListProps> = ({setGoalTabNav, sheetRef, na
             return (
               <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
                 {elm.category == "core" ?
-                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                    <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%" }} />
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                    <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%",marginTop: "1%", alignSelf: "flex-start" }} />
                     <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                   </TouchableOpacity>
                   : null}
@@ -351,7 +351,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({setGoalTabNav, sheetRef, na
                   : null}
                 {elm.category == "healthy_habits" ?
                   <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                    <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%" }} />
+                    <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%",marginTop: "1%", alignSelf: "flex-start"  }} />
                     <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                   </TouchableOpacity>
                   : null}
