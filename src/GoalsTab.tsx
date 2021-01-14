@@ -16,10 +16,11 @@ interface GoalProps {
     addActivityRef,
     activityRef,
     setCompleted,
-    setSelectedActivity
+    setSelectedActivity,
+    autoPopulateWindow
 }
 
-export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActivityRef, activityRef, setCompleted, setSelectedActivity}) => {
+export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActivityRef, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow}) => {
     const dispatch = useDispatch();
     const { user } = useSelector((state: ApplicationState) => state.userReducer);
     const { token } = user;
@@ -69,7 +70,7 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                   <View key={pen.id}>
                     <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
                     {/* onPress={() => activityCompleted(pen, goalSelected)} */}
-                    <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id);}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                    <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id);autoPopulateWindow(pen.id,goalSelected.id,"activities_overdue");}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
                       <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{ marginRight: "2%" }} />
                       <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
                     </TouchableOpacity>
@@ -80,12 +81,30 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                           <Text style={{ fontSize: 14, fontFamily: "OpenSans_400Regular", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
                         </View>
                         : null}
-                      {pen.recurring == "daily" ?
-                        <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                          <Entypo name="cycle" size={20} color="#F84B01" />
-                          <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}> DAILY</Text>
-                        </View>
-                        : null}
+                        {pen.recurring == "daily" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "weekly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> WEEKLY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "monthly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> MONTHLY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "quarterly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> QUARTERLY</Text>
+                          </View>
+                          : null}
                       {pen.deadline_at != null ?
                         <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
                           <MaterialCommunityIcons name="calendar-month-outline" size={20} color="#F84B01" />
@@ -102,7 +121,7 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                 {goalSelected.activities_pending.map(pen => {
                   return (
                     <View key={pen.id}>
-                      <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(false);setSelectedActivity(pen.id);}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                      <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(false);setSelectedActivity(pen.id);console.log(pen);autoPopulateWindow(pen.id,goalSelected.id,"activities_pending");}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
                         <Fontisto name="checkbox-passive" size={30} color="black" style={{ marginRight: "2%" }} />
                         <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                       </TouchableOpacity>
@@ -117,6 +136,24 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                           <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
                             <Entypo name="cycle" size={20} color="black" />
                             <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "weekly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> WEEKLY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "monthly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> MONTHLY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "quarterly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> QUARTERLY</Text>
                           </View>
                           : null}
                         {pen.deadline_at != null ?
@@ -137,7 +174,7 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                 {goalSelected.activities_finished.map(pen => {
                   return (
                     <View key={pen.id} >
-                      <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(true);setSelectedActivity(pen.id);}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
+                      <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(true);setSelectedActivity(pen.id);autoPopulateWindow(pen.id,goalSelected.id,"activities_finished");}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
                         <AntDesign name="checksquareo" size={30} color="black" style={{ marginRight: "2%" }} />
                         <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                       </TouchableOpacity>
@@ -152,6 +189,24 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                           <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
                             <Entypo name="cycle" size={20} color="black" />
                             <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "weekly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> WEEKLY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "monthly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> MONTHLY</Text>
+                          </View>
+                          : null}
+                        {pen.recurring == "quarterly" ?
+                          <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                            <Entypo name="cycle" size={20} color="black" />
+                            <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> QUARTERLY</Text>
                           </View>
                           : null}
                         {pen.deadline_at != null ?

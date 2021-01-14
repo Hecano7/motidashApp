@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { AppParamList } from './AppParamList';
 import { Center } from './Center';
 import { Goal, GoalsList } from './GoalsTab';
-import { StyleSheet, Button, Text, View, SafeAreaView, TextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { Button, Text, View, SafeAreaView, TextInput, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { AuthContext } from './AuthProvider';
 import Moticon from '../customIcon';
 import { useSelector, useDispatch } from 'react-redux';
@@ -35,7 +35,7 @@ function LeaderBoard() {
   )
 }
 
-function GoalsTab({ sheetRef, updateRef, addActivityRef, setSelectedGoal , activityRef, setCompleted, setSelectedActivity}) {
+function GoalsTab({ sheetRef, updateRef, addActivityRef, setSelectedGoal, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow }) {
   const GoalsStack = createStackNavigator();
   return (
     <GoalsStack.Navigator initialRouteName="GoalsList">
@@ -43,7 +43,7 @@ function GoalsTab({ sheetRef, updateRef, addActivityRef, setSelectedGoal , activ
         {(props) => <GoalsList  {...props} sheetRef={sheetRef} setSelectedGoal={setSelectedGoal} />}
       </GoalsStack.Screen>
       <GoalsStack.Screen name="Goal" options={{ header: () => null }} >
-        {(props) => <Goal  {...props} updateRef={updateRef} activityRef={activityRef} addActivityRef={addActivityRef} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} />}
+        {(props) => <Goal  {...props} updateRef={updateRef} activityRef={activityRef} addActivityRef={addActivityRef} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow}/>}
       </GoalsStack.Screen>
     </GoalsStack.Navigator>
   );
@@ -70,6 +70,7 @@ function Search() {
 
 export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const { user, error } = useSelector((state: ApplicationState) => state.userReducer);
+  const { userGoals } = useSelector((state: ApplicationState) => state.loadUserDataReducer);
   const { token } = user;
 
   useEffect(() => {
@@ -146,10 +147,10 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     console.log(selectedGoal);
     let data = new FormData();
     data.append('okr_activity[name]', firstText);
-    if (toggle == "date"){
-      data.append('okr_activity[recurring]', selectedValue);
-    }else{
+    if (toggle == "date") {
       data.append('okr_activity[deadline_at]', selectedStartDate);
+    } else {
+      data.append('okr_activity[recurring]', selectedValue);
     };
 
     const config = {
@@ -161,19 +162,55 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       },
       data: data
     };
-    console.log(data);
+    console.log(typeof selectedStartDate);
 
     axios(config)
       .then((response) => {
-        console.log("Response: ",JSON.stringify(response.data));
+        console.log("Response: ", JSON.stringify(response.data));
       })
       .catch((error) => {
-        console.log("Error: ",error);
+        console.log("Error: ", error);
       });
 
     alert("A new activity has been added.");
 
     addActivityRef.current.snapTo(2);
+
+    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+  };
+
+  const updateActivity = () => {
+    let data = new FormData();
+    data.append('okr_activity[name]', firstText);
+    if (toggle == "date") {
+      data.append('okr_activity[deadline_at]', selectedStartDate);
+    } else {
+      data.append('okr_activity[recurring]', selectedValue);
+    };
+
+    console.log(toggle);
+
+    // const config = {
+    //   method: 'patch',
+    //   url: `${BASE_URL}goals/objectives/${selectedGoal}/activities/${selectedActivity}.json`,
+    //   headers: {
+    //     'token': token,
+    //     'Content-Type': 'application/json'
+    //   },
+    //   data: data
+    // };
+
+    // axios(config)
+    //   .then((response) => {
+    //     console.log("Response: ", JSON.stringify(response.data));
+    //   })
+    //   .catch((error) => {
+    //     console.log("Error: ", error);
+    //   });
+
+    alert("A new activity has been updated.");
+
+    activityRef.current.snapTo(2);
 
     setTimeout(function () { dispatch(onUserData(token)); }, 3000);
   };
@@ -202,7 +239,116 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     alert("Activity has been marked as completed.");
 
     setTimeout(function () { dispatch(onUserData(token)); }, 3000);
-};
+  };
+
+  const removeActivity = (activityId, goalId) => {
+    let config = {
+      method: 'delete',
+      url: `${BASE_URL}goals/objectives/${goalId}/activities/${activityId}.json`,
+      headers: {
+        'token': token,
+      },
+      data: ""
+    };
+
+    axios(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    activityRef.current.snapTo(2);
+
+    alert("Activity has been removed.");
+
+    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+
+  };
+
+  const autoPopulateWindow = (activityId, goalId, window) => {
+    let userGoal = JSON.parse(JSON.stringify(userGoals));
+
+    if (window == "activities_finished") {
+      for (let i = 0; i < userGoal.length; i++) {
+        if (userGoals[i].id == goalId) {
+          for (let n = 0; n < userGoal[i].activities_finished.length; n++) {
+            if (userGoal[i].activities_finished[n].id == activityId) {
+              setFirstText(userGoal[i].activities_finished[n].name);
+              if(userGoal[i].activities_finished[n].recurring !== null){
+                setToggle("recurring");
+                select("fourth");
+                setSelectedValue(userGoal[i].activities_finished[n].recurring);
+              };
+              if(userGoal[i].activities_finished[n].deadline_at !== null){
+                let split = userGoal[i].activities_finished[n].deadline_at.split("/");
+                setSelectedStartDate(`${split[2]}-${split[0]}-${split[1]}`);
+                setToggle("date");
+                select("fith");
+              };
+              if(userGoal[i].activities_finished[n].deadline_at !== null && userGoal[i].activities_finished[n].recurring !== null){
+                select("sixth");
+                setToggle("both");
+              }
+            }
+          }
+        }
+      }
+    };
+    if (window == "activities_overdue") {
+      for (let i = 0; i < userGoal.length; i++) {
+        if (userGoals[i].id == goalId) {
+          for (let n = 0; n < userGoal[i].activities_overdue.length; n++) {
+            if (userGoal[i].activities_overdue[n].id == activityId) {
+              setFirstText(userGoal[i].activities_overdue[n].name);
+              if(userGoal[i].activities_overdue[n].recurring !== null){
+                setToggle("recurring");
+                select("fourth");
+                setSelectedValue(userGoal[i].activities_overdue[n].recurring);
+              };
+              if(userGoal[i].activities_overdue[n].deadline_at !== null){
+                let split = userGoal[i].activities_overdue[n].deadline_at.split("/");
+                setSelectedStartDate(`${split[2]}-${split[0]}-${split[1]}`);
+                setToggle("date");
+                select("fith");
+              };
+              if(userGoal[i].activities_overdue[n].deadline_at !== null && userGoal[i].activities_overdue[n].recurring !== null){
+                select("sixth");
+                setToggle("both");
+              }
+            }
+          }
+        }
+      }
+    };
+    if (window == "activities_pending") {
+      for (let i = 0; i < userGoal.length; i++) {
+        if (userGoals[i].id == goalId) {
+          for (let n = 0; n < userGoal[i].activities_pending.length; n++) {
+            if (userGoal[i].activities_pending[n].id == activityId) {
+              setFirstText(userGoal[i].activities_pending[n].name);
+              if(userGoal[i].activities_pending[n].recurring !== null){
+                setToggle("recurring");
+                select("fourth");
+                setSelectedValue(userGoal[i].activities_pending[n].recurring);
+              };
+              if(userGoal[i].activities_pending[n].deadline_at !== null){
+                let split = userGoal[i].activities_pending[n].deadline_at.split("/");
+                setSelectedStartDate(`${split[2]}-${split[0]}-${split[1]}`);
+                setToggle("date");
+                select("fith");
+              };
+              if(userGoal[i].activities_pending[n].deadline_at !== null && userGoal[i].activities_pending[n].recurring !== null){
+                select("sixth");
+                setToggle("both");
+              }
+            }
+          }
+        }
+      }
+    }
+  };
 
   const select = (x) => {
     if (x == "first") {
@@ -239,6 +385,11 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       setThird('#48B0B1')
       setToggle("date")
     }
+    if (x == "sixth") {
+      setFirst('#48B0B1')
+      setThird('#48B0B1')
+      setToggle("both")
+    }
   };
   const sheetRef = React.useRef(null);
   const updateRef = React.useRef(null);
@@ -246,7 +397,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const calendarRef = React.useRef(null);
   const activityRef = React.useRef(null);
 
-  const renderContent = () => (
+  const addGoal = () => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={{ backgroundColor: 'white', height: "100%" }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
@@ -256,8 +407,9 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         </View>
         <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
         <TextInput
+          value={firstText} 
           onChangeText={setFirstText}
-          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }}
+          style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20, overflow:"scroll" }}
         />
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "12%", width: "100%" }}>
           <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
@@ -285,7 +437,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     </TouchableWithoutFeedback>
   );
 
-  const updateContent = () => (
+  const editGoal = () => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={{ backgroundColor: 'white', height: "100%" }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
@@ -293,10 +445,10 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
           <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Update goal</Text>
           <View style={{ width: "14%" }} />
         </View>
-        <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={true}>
+        <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={{height: 820}} showsVerticalScrollIndicator={true}>
           <SafeAreaView>
             <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Goal</Text>
-            <TextInput multiline={true} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }} />
+            <TextInput multiline={true} value={firstText} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20, overflow:"scroll" }} />
             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "10%", width: "100%" }}>
               <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
                 <FontAwesome name="star" size={18} color="black" />
@@ -349,6 +501,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         </View>
         <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Activity</Text>
         <TextInput
+          value={firstText} 
           onChangeText={setFirstText}
           style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20, overflow: "scroll" }}
           placeholder="Add an activity for this objective?"
@@ -407,7 +560,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     </View>
   );
 
-  const activityUpdate = () => (
+  const editActivity = () => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <View style={{ backgroundColor: 'white', height: "100%" }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: "center", borderBottomColor: '#D8D8D8', borderBottomWidth: 1, height: "10%", width: "100%", paddingLeft: "2%" }}>
@@ -415,46 +568,85 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
           <Text style={{ fontSize: 20, fontFamily: "OpenSans_600SemiBold" }}>Update activity</Text>
           <View style={{ width: "14%" }} />
         </View>
-        <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={styles.contentContainer} showsVerticalScrollIndicator={true}>
+        <ScrollView automaticallyAdjustContentInsets={true} contentContainerStyle={{height: toggle !== "both" ? "100%" : 910}} showsVerticalScrollIndicator={true}>
           <SafeAreaView>
             <Text style={{ fontSize: 22, fontFamily: "OpenSans_600SemiBold", marginLeft: "5%", marginTop: "5%" }}>Activity</Text>
-            <TextInput multiline={true} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: "15%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20 }} />
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: "center", height: "10%", width: "100%" }}>
-              <TouchableOpacity onPress={() => select("first")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-                <FontAwesome name="star" size={18} color="black" />
-                <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> CORE</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => select("second")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: second, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-                <EvilIcons name="star" size={23} color="black" />
-                <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>CONTEXT</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => select("third")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "4.5%", paddingRight: "4.5%" }}>
-                <MaterialCommunityIcons name="food-apple-outline" size={20} color="black" />
-                <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}>HEALTHY HABITS</Text>
-              </TouchableOpacity>
-            </View>
+            <TextInput multiline={true} value={firstText} onChangeText={setFirstText} style={{ borderColor: '#D8D8D8', borderWidth: 1, margin: "5%", height: toggle !== "both" ? "15%" : "10%", padding: "5%", paddingTop: "5%", marginTop: 0, fontSize: 20, overflow:"scroll" }} />
+            <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: "center", height: toggle !== "both" ? "12%" : "8%", width: "50%", alignSelf: "center" }}>
 
-            <View style={{ margin: "5%", backgroundColor: "#D0EBEA", borderRadius: 10, height: "30%", padding: "5%" }}>
-              <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20 }}>This is a <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>{secondText}</Text></Text>
-              <Text style={{ fontFamily: "OpenSans_400Regular", fontSize: 20, marginTop: "6%" }}>{thirdText}</Text>
-            </View>
+          <TouchableOpacity onPress={() => select("fourth")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: first, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+            <Entypo name="cycle" size={19} color="black" />
+            <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY IS RECURRING</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => select("fith")} style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", borderWidth: 3, borderColor: third, borderRadius: 12, height: "85%", paddingLeft: "3%", paddingRight: "3%" }}>
+            <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
+            <Text style={{ fontSize: 12, fontFamily: "OpenSans_600SemiBold" }}> ACTIVITY HAS A DEADLINE</Text>
+          </TouchableOpacity>
+        </View>
+        {toggle !== "both" ?
+        <View style={{height: "35%"}}>
+        <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%", height: "30%" }}>How often would you like to complete this activity?</Text>
+        <View style={{ height: "40%", width: "90%", borderColor: 'black', borderWidth: 1, marginTop: "5%", marginBottom: "1%", alignSelf: "center", overflow: "hidden" }}>
+          <TouchableOpacity style={{ height: "100%", alignContent: "center" }} onPress={() => { calendarRef.current.snapTo(0); setBackgroundColor('#F2F2F2'); }}>
+            {toggle == "recurring" ?
+              <Picker
+                selectedValue={selectedValue}
+                style={{ height: "100%", width: "100%", justifyContent: "center" }}
+                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue.toString())}
+              >
+                <Picker.Item label="Once" value="" />
+                <Picker.Item label="Everyday" value="daily" />
+                <Picker.Item label="Every Week" value="weekly" />
+                <Picker.Item label="Every Month" value="monthly" />
+                <Picker.Item label="Every Quarter" value="quarterly" />
+              </Picker>
+              : null}
+            {toggle == "date" ?
+              <Text style={{ alignSelf: "center", marginVertical: "10%", fontWeight: "500", fontSize: 25, height: "100%" }}>{selectedStartDate.replace(/-/g, "/")}</Text>
+              : null}
+          </TouchableOpacity>
+        </View>
+        </View>
+        :
+        <View style={{height: "45%"}}>
+        <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%", height: "15%" }}>How often would you like to complete this activity?</Text>
+        <View style={{ height: "25%", width: "90%", borderColor: 'black', borderWidth: 1, marginTop: "5%", marginBottom: "1%", alignSelf: "center", overflow: "hidden" }}>
+          <TouchableOpacity style={{ height: "100%", alignContent: "center" }} onPress={() => { calendarRef.current.snapTo(0); setBackgroundColor('#F2F2F2'); }}>
+              <Picker
+                selectedValue={selectedValue}
+                style={{ height: "100%", width: "100%", justifyContent: "center" }}
+                onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue.toString())}
+              >
+                <Picker.Item label="Once" value="" />
+                <Picker.Item label="Everyday" value="daily" />
+                <Picker.Item label="Every Week" value="weekly" />
+                <Picker.Item label="Every Month" value="monthly" />
+                <Picker.Item label="Every Quarter" value="quarterly" />
+              </Picker>
+          </TouchableOpacity>
+        </View>
+        <Text style={{ fontFamily: "OpenSans_600SemiBold", fontSize: 20, width: "90%", alignSelf: "center", marginTop: "5%", height: "8%" }}>Deadline</Text>
+        <View style={{ height: "25%", width: "90%", borderColor: 'black', borderWidth: 1, marginTop: "5%", marginBottom: "1%", alignSelf: "center", overflow: "hidden" }}>
+          <TouchableOpacity style={{ height: "100%", alignContent: "center" }} onPress={() => { calendarRef.current.snapTo(0); setBackgroundColor('#F2F2F2'); }}>
+              <Text style={{ alignSelf: "center", marginVertical: "10%", fontWeight: "500", fontSize: 25, height: "100%" }}>{selectedStartDate.replace(/-/g, "/")}</Text>
+          </TouchableOpacity>
+        </View>
+        </View>
+        }
 
-            <TouchableOpacity style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", marginBottom: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
-              <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Update goal</Text>
+            <TouchableOpacity onPress={updateActivity} style={{ backgroundColor: "#FCC755", padding: "5%", marginLeft: "5%", marginRight: "5%", marginBottom: "5%", borderRadius: 30, justifyContent: 'center', alignItems: 'center' }} >
+              <Text style={{ color: "white", fontWeight: "500", fontSize: 22 }}>Update activity</Text>
             </TouchableOpacity>
 
-            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", alignSelf: "center", marginBottom: "5%" }}>
               {completed == false ?
-              <TouchableOpacity onPress={() => activityCompleted(selectedActivity, selectedGoal)} style={{ backgroundColor: "#47AFB0", padding: "9%", paddingRight: "2%", paddingLeft: "2%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
-                <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Mark completed <Feather name="check" size={24} color="white" /></Text>
-              </TouchableOpacity>
-              : null}
-              <TouchableOpacity style={{ backgroundColor: "#47AFB0", padding: "13%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
-                <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Share</Text>
-              </TouchableOpacity>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%", alignSelf: "center", marginBottom: "5%" }}>
+                <TouchableOpacity onPress={() => activityCompleted(selectedActivity, selectedGoal)} style={{ backgroundColor: "#47AFB0", padding: "9%", paddingRight: "2%", paddingLeft: "2%", borderRadius: 14, justifyContent: 'center', alignItems: 'center' }} >
+                  <Text style={{ color: "white", fontWeight: "500", fontSize: 20 }}>Mark completed <Feather name="check" size={24} color="white" /></Text>
+                </TouchableOpacity>
             </View>
+                : null}
 
-            <TouchableOpacity style={{ borderColor: "#F97459", borderWidth: 3, padding: "4%", marginLeft: "5%", marginRight: "5%", marginBottom: "10%", marginTop: 1, borderRadius: 14, justifyContent: 'center', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => removeActivity(selectedActivity, selectedGoal)} style={{ borderColor: "#F97459", borderWidth: 3, padding: "4%", marginLeft: "5%", marginRight: "5%", marginBottom: "10%", marginTop: 1, borderRadius: 14, justifyContent: 'center', alignItems: 'center' }}>
               <Text style={{ color: "#F97459", fontFamily: "OpenSans_600SemiBold", fontSize: 20 }}>Remove</Text>
             </TouchableOpacity>
           </SafeAreaView>
@@ -493,7 +685,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               <Moticon name='Bullseye-Pointer' size={30} color={color} />
             ),
           }}>
-          {(props) => <GoalsTab  {...props} sheetRef={sheetRef} updateRef={updateRef} addActivityRef={addActivityRef} activityRef={activityRef} setSelectedGoal={setSelectedGoal} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} />}
+          {(props) => <GoalsTab  {...props} sheetRef={sheetRef} updateRef={updateRef} addActivityRef={addActivityRef} activityRef={activityRef} setSelectedGoal={setSelectedGoal} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow}/>}
         </Tabs.Screen>
         <Tabs.Screen
           name='ActionPlans'
@@ -535,7 +727,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       <BottomSheet
         ref={sheetRef}
         snapPoints={["85%", 0, 0]}
-        renderContent={renderContent}
+        renderContent={addGoal}
         initialSnap={2}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
@@ -543,7 +735,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       <BottomSheet
         ref={updateRef}
         snapPoints={["85%", 0, 0]}
-        renderContent={updateContent}
+        renderContent={editGoal}
         initialSnap={2}
         enabledInnerScrolling={true}
         enabledContentGestureInteraction={true}
@@ -559,6 +751,16 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         enabledContentTapInteraction={false}
       />
       <BottomSheet
+        ref={activityRef}
+        snapPoints={["85%", 0, 0]}
+        renderContent={editActivity}
+        initialSnap={2}
+        enabledInnerScrolling={true}
+        enabledContentGestureInteraction={true}
+        enabledGestureInteraction={true}
+        enabledContentTapInteraction={false}
+      />
+      <BottomSheet
         ref={calendarRef}
         snapPoints={["55%", 0, 0]}
         renderContent={calendarContent}
@@ -566,22 +768,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
       />
-      <BottomSheet
-        ref={activityRef}
-        snapPoints={["85%", 0, 0]}
-        renderContent={activityUpdate}
-        initialSnap={2}
-        enabledInnerScrolling={true}
-        enabledContentGestureInteraction={true}
-        enabledGestureInteraction={true}
-        enabledContentTapInteraction={false}
-      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  contentContainer: {
-    height: 820
-  }
-});
