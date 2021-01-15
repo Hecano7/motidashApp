@@ -339,20 +339,20 @@ export const GoalsList: React.FC<GoalsListProps> = ({setGoalTabNav, sheetRef, na
             return (
               <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
                 {elm.category == "core" ?
-                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "90%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                     <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%",marginTop: "1%", alignSelf: "flex-start" }} />
-                    <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
+                    <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                   </TouchableOpacity>
                   : null}
                 {elm.category == "context" ?
-                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                    <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "90%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                    <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
                   </TouchableOpacity>
                   : null}
                 {elm.category == "healthy_habits" ?
-                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "90%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                     <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%",marginTop: "1%", alignSelf: "flex-start"  }} />
-                    <Text style={{ fontSize: 22, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
+                    <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                   </TouchableOpacity>
                   : null}
                 <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center" }}>
