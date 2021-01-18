@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { Text, View, SafeAreaView, TouchableWithoutFeedback, Keyboard, Alert, Button, RefreshControl } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState, onUserData } from '../src/redux';
-import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, Ionicons, SimpleLineIcons } from '@expo/vector-icons';
+import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, Ionicons, SimpleLineIcons, MaterialIcons } from '@expo/vector-icons';
 import Moticon from '../customIcon';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import { BASE_URL } from './utils';
 import axios from 'axios';
+import Draggable from 'react-native-draggable';
 
 interface GoalProps {
     navigation,
@@ -84,7 +85,7 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                     <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
                     {/* onPress={() => activityCompleted(pen, goalSelected)} */}
                     <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id);autoPopulateWindow(pen.id,goalSelected.id,"activities_overdue");}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                      <Fontisto name="checkbox-passive" size={25} color="#F84B01" style={{ marginRight: "2%" }} />
+                    <MaterialIcons name="check-box-outline-blank" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
                       <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -135,7 +136,7 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                   return (
                     <View key={pen.id}>
                       <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(false);setSelectedActivity(pen.id);console.log(pen);autoPopulateWindow(pen.id,goalSelected.id,"activities_pending");}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                        <Fontisto name="checkbox-passive" size={30} color="black" style={{ marginRight: "2%" }} />
+                        <MaterialIcons name="check-box-outline-blank" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
                         <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                       </TouchableOpacity>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -188,8 +189,8 @@ export const Goal: React.FC<GoalProps> = ({navigation, route, updateRef, addActi
                   return (
                     <View key={pen.id} >
                       <TouchableOpacity onPress={() => {activityRef.current.snapTo(0); setCompleted(true);setSelectedActivity(pen.id);autoPopulateWindow(pen.id,goalSelected.id,"activities_finished");}} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                        <AntDesign name="checksquareo" size={30} color="black" style={{ marginRight: "2%" }} />
-                        <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
+                      <Ionicons name="md-checkbox-outline" size={34} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
+                        <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}> {pen.name}</Text>
                       </TouchableOpacity>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                         {pen.points > 0 ?
@@ -329,7 +330,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({setGoalTabNav, sheetRef, na
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ height: "15%", flexDirection: "row", paddingLeft: "6%", alignItems: "flex-end", paddingBottom: "3%" }}>
+        <View style={{ height: "15%", flexDirection: "row", paddingLeft: "5%", alignItems: "flex-end", paddingBottom: "3%" }}>
           <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
           <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
         </View>
@@ -339,18 +340,18 @@ export const GoalsList: React.FC<GoalsListProps> = ({setGoalTabNav, sheetRef, na
             return (
               <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
                 {elm.category == "core" ?
-                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "90%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                     <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%",marginTop: "1%", alignSelf: "flex-start" }} />
                     <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                   </TouchableOpacity>
                   : null}
                 {elm.category == "context" ?
-                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "90%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                     <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
                   </TouchableOpacity>
                   : null}
                 {elm.category == "healthy_habits" ?
-                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "90%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
+                  <TouchableOpacity style={{ flexDirection: "row", padding: "5%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                     <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%",marginTop: "1%", alignSelf: "flex-start"  }} />
                     <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                   </TouchableOpacity>
@@ -366,8 +367,8 @@ export const GoalsList: React.FC<GoalsListProps> = ({setGoalTabNav, sheetRef, na
                   return (
                     <View key={pen.id}>
                       <TouchableOpacity onPress={() => activityCompleted(pen, elm)} style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                        <Fontisto name="checkbox-passive" size={25} color="black" style={{ marginRight: "2%" }} />
-                        <Text style={{ fontSize: 23, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
+                        <MaterialIcons name="check-box-outline-blank" size={25} color="black" style={{ marginRight: "2%" }} />
+                        <Text style={{ fontSize: 20, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
                       </TouchableOpacity>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
                         {pen.points > 0 ?
