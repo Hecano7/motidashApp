@@ -19,6 +19,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import CalendarPicker from 'react-native-calendar-picker';
 import moment from "moment";
+import { useScrollToTop } from '@react-navigation/native';
 
 interface AppTabsProps {
   store: any
@@ -85,6 +86,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   }, [user, error]);
 
   const dispatch = useDispatch();
+  
   const reload = () => {
     AsyncStorage.getItem('account')
       .then(userString => {
@@ -141,7 +143,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     sheetRef.current.snapTo(2);
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
   };
 
   const updateGoal = () => {
@@ -180,7 +182,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     goalTabNav.navigate('GoalsList');
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
 
   };
 
@@ -208,7 +210,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     goalTabNav.navigate('GoalsList');
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
   };
 
   const completeGoal = () => {
@@ -234,7 +236,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     goalTabNav.navigate('GoalsList');
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
   };
 
   const addNewActivity = () => {
@@ -270,7 +272,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     addActivityRef.current.snapTo(2);
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
   };
 
   const updateActivity = () => {
@@ -306,7 +308,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     activityRef.current.snapTo(2);
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
   };
 
   const activityCompleted = (activityId, goalId) => {
@@ -332,7 +334,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     alert("Activity has been marked as completed.");
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
   };
 
   const removeActivity = (activityId, goalId) => {
@@ -502,11 +504,20 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     }
   };
 
+  const onCloseWindow = () => {
+    setFirstText("");
+    select("first");
+  };
+
   const sheetRef = React.useRef(null);
   const updateRef = React.useRef(null);
   const addActivityRef = React.useRef(null);
   const calendarRef = React.useRef(null);
   const activityRef = React.useRef(null);
+
+  const onStartWindow = (window) => {
+    useScrollToTop(window);
+  };
 
   const addGoal = () => (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -842,6 +853,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         initialSnap={2}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
+        onCloseEnd={onCloseWindow}
       />
       <BottomSheet
         ref={updateRef}
@@ -852,6 +864,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         enabledContentGestureInteraction={true}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
+        // onOpenStart={() => onStartWindow(updateRef)}
+        onCloseEnd={onCloseWindow}
       />
       <BottomSheet
         ref={addActivityRef}
@@ -860,6 +874,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         initialSnap={2}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
+        onCloseEnd={onCloseWindow}
       />
       <BottomSheet
         ref={activityRef}
@@ -870,6 +885,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         enabledContentGestureInteraction={true}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
+        // onOpenStart={() => onStartWindow(activityRef)}
+        onCloseEnd={onCloseWindow}
       />
       <BottomSheet
         ref={calendarRef}
@@ -878,6 +895,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         initialSnap={2}
         enabledGestureInteraction={true}
         enabledContentTapInteraction={false}
+        onCloseEnd={onCloseWindow}
       />
     </View>
   );
