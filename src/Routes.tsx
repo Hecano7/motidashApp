@@ -24,9 +24,9 @@ export const Routes: React.FC<RoutesProps> = ({}) => {
     .then(userString => {
       if (userString) {
         // decode it
-        login();
+        // login();
       }
-        setLoading(false);
+      setLoading(false);
     })
     .catch(err => {
       console.log(err);

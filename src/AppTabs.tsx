@@ -79,7 +79,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       dispatch(onUserData(token));
     };
     if (token == undefined) {
-      console.log("Token: ", token);
       reload();
     };
     //do nothing
@@ -90,10 +89,8 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const reload = () => {
     AsyncStorage.getItem('account')
       .then(userString => {
-        if (userString !== null) {
+        if (userString) {
           dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
-        } else {
-
         }
       })
       .catch(err => {
@@ -143,7 +140,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     sheetRef.current.snapTo(2);
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
+    dispatch(onUserData(token));
   };
 
   const updateGoal = () => {
@@ -182,7 +179,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     goalTabNav.navigate('GoalsList');
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
+    dispatch(onUserData(token));
 
   };
 
@@ -210,7 +207,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     goalTabNav.navigate('GoalsList');
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
+    dispatch(onUserData(token));
   };
 
   const completeGoal = () => {
@@ -236,7 +233,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     goalTabNav.navigate('GoalsList');
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
+    dispatch(onUserData(token));
   };
 
   const addNewActivity = () => {
@@ -272,7 +269,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     addActivityRef.current.snapTo(2);
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
+    dispatch(onUserData(token));
   };
 
   const updateActivity = () => {
@@ -308,7 +305,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     activityRef.current.snapTo(2);
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
+    dispatch(onUserData(token));
   };
 
   const activityCompleted = (activityId, goalId) => {
@@ -334,7 +331,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     alert("Activity has been marked as completed.");
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 1000);
+    dispatch(onUserData(token));
   };
 
   const removeActivity = (activityId, goalId) => {

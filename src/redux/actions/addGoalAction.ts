@@ -12,12 +12,17 @@ export interface LoginAction {
   payload: UserModel;
 }
 
+export interface LogoutAction {
+  readonly type: 'ON_LOGOUT';
+  payload: UserModel;
+}
+
 export interface ErrorAction {
   readonly type: 'ON_ERROR';
   payload: any;
 }
 
-export type UserAction = LoginAction | ErrorAction;
+export type UserAction = LoginAction | LogoutAction | ErrorAction;
 
 // we need to dispatch action
 export const onLogin = (email: string, password: string) => {
@@ -51,5 +56,15 @@ export const onLogin = (email: string, password: string) => {
         payload: error,
       });
     }
+  };
+};
+
+export const onLogout = () => {
+  return async (dispatch: Dispatch<UserAction>) => {
+    dispatch({
+      type: 'ON_LOGOUT',
+      payload: undefined,
+    });
+    // console.log(UserModel);
   };
 };

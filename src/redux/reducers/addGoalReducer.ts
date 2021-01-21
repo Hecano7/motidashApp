@@ -18,6 +18,11 @@ const UserReducer = (state: UserState = initialState, action: UserAction) => {
         ...state,
         user: action.payload,
       };
+    case 'ON_LOGOUT':
+      return {
+        ...state,
+        user: action.payload,
+      };
     case 'ON_ERROR':
       return {
         ...state,

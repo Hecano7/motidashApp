@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState, onUserData } from '../src/redux';
 import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, Ionicons, SimpleLineIcons, MaterialIcons } from '@expo/vector-icons';
 import Moticon from '../customIcon';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { FlatList, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import { BASE_URL } from './utils';
 import axios from 'axios';
@@ -94,9 +94,9 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
         </View>
         <ScrollView style={{ width: "100%" }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <View onStartShouldSetResponder={() => true}>
-            {goals.slice(0).reverse().map(elm => {
+            {goals.map(elm => {
               return (
-                <View key={elm.id} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
+                <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
                   {elm.category == "core" ?
                     <TouchableOpacity style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
                       <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%", marginTop: "1%", alignSelf: "flex-start" }} />
@@ -114,20 +114,19 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
                       <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
                     </TouchableOpacity>
                     : null}
-                  <View style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center" }}>
+                  <View style={{ flexDirection: "row", paddingLeft: "13.5%", marginTop: ".8%", marginBottom: "2.5%", alignItems: "center" }}>
                     <View style={{ backgroundColor: "#D1EBEC", height: 5, width: "35%", borderRadius: 5, marginRight: "3%" }}>
                       <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${elm.completion}%`, borderRadius: 5 }} />
                     </View>
                     <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{elm.completion}%</Text>
-
                   </View>
                   {elm.activities_pending.map(pen => {
                     return (
                       <View key={pen.id}>
-                        <TouchableOpacity onPress={() => activityCompleted(pen, elm)} style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", padding: "1.5%", marginRight: "2%" }}>
-                          <MaterialIcons name="check-box-outline-blank" size={25} color="black" style={{ marginRight: "2%" }} />
+                        <View style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", padding: "1.5%", marginRight: "2%" }}>
+                          <MaterialIcons onPress={() => activityCompleted(pen, elm)} name="check-box-outline-blank" size={24} color="black" style={{ marginRight: "2%" }} />
                           <Text style={{ fontSize: 20, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
-                        </TouchableOpacity>
+                        </View>
                         {pen.points == 0 && pen.deadline_at == null && pen.recurring == "" ?
                           null :
                           <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>

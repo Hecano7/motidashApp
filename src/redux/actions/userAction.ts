@@ -12,16 +12,20 @@ export interface LoginAction {
   payload: UserModel;
 }
 
+export interface LogoutAction {
+  readonly type: 'ON_LOGOUT';
+  payload: UserModel;
+}
+
 export interface ErrorAction {
   readonly type: 'ON_ERROR';
   payload: any;
 }
 
-export type UserAction = LoginAction | ErrorAction;
+export type UserAction = LoginAction | LogoutAction | ErrorAction;
 
 // we need to dispatch action
 export const onLogin = (email: string, password: string) => {
-  
   return async (dispatch: Dispatch<UserAction>) => {
     try {
       const response = await axios.post<UserModel>(`${BASE_URL}session.json`, {
@@ -51,5 +55,15 @@ export const onLogin = (email: string, password: string) => {
         payload: error,
       });
     }
+  };
+};
+
+export const onLogout = () => {
+  return async (dispatch: Dispatch<UserAction>) => {
+    console.log("onLogout");
+    dispatch({
+      type: 'ON_LOGIN',
+      payload: { token: undefined},
+    });
   };
 };

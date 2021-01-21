@@ -112,12 +112,12 @@ function SignIn({ navigation }:
   useEffect(() => {
     if (token !== undefined) {
       console.log("Token: ", token);
-      console.log(user);
+      // console.log(user);
       loading(false);
       dispatch(onUserData(token));
       login();
     };
-    if (error !== undefined && token !== undefined) {
+    if (error !== undefined) {
       // console.log(error);
       alert("Incorrect username or password");
       loading(false);
@@ -128,6 +128,8 @@ function SignIn({ navigation }:
   const onTapLogin = () => {
     loading(true);
     dispatch(onLogin(email, password));
+    setEmail("");
+    setPassword("");
   };
 
   return (
@@ -135,7 +137,6 @@ function SignIn({ navigation }:
     <View style={{ flex: 1 }}>
       <Header title="Log into your account" navigation={navigation} />
           <View style={{ flex: 4 }}>
-
             <View style={{ flex: 2, justifyContent: 'flex-end' }}>
               <Text style={styles.label} >Email</Text>
               <TextInput style={styles.input} placeholder="" autoCapitalize="none" onChangeText={setEmail} />
