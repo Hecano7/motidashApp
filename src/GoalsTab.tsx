@@ -8,7 +8,7 @@ import { FlatList, ScrollView, TouchableOpacity } from 'react-native-gesture-han
 import { AntDesign } from '@expo/vector-icons';
 import { BASE_URL } from './utils';
 import axios from 'axios';
-import Draggable from 'react-native-draggable';
+import DraggableFlatList from "react-native-draggable-flatlist";
 
 interface GoalsListProps {
   sheetRef,
@@ -85,6 +85,121 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
     wait(2000).then(() => setRefreshing(false));
   }, []);
 
+  const dragList = ({ item, index, drag, isActive }) => {
+    return (
+        <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%", backgroundColor: "#F2F2F2" }}>
+          {item.category == "core" ?
+            <View style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
+              <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
+                <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%", marginTop: "1%" }} />
+                <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "93%" }}>{item.name}</Text>
+              </TouchableOpacity>
+              <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
+            </View>
+            : null}
+          {item.category == "context" ?
+            <View style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
+              <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
+                <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "10%", width: "93%" }}>{item.name}</Text>
+              </TouchableOpacity>
+              <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
+            </View>
+            : null}
+          {item.category == "healthy_habits" ?
+            <View style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
+              <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
+                <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%", marginTop: "1%" }} />
+                <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "93%" }}>{item.name}</Text>
+              </TouchableOpacity>
+              <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
+            </View>
+            : null}
+          <View style={{ flexDirection: "row", paddingLeft: "13.5%", marginTop: ".8%", marginBottom: "2.5%", alignItems: "center" }}>
+            <View style={{ backgroundColor: "#D1EBEC", height: 5, width: "35%", borderRadius: 5, marginRight: "3%" }}>
+              <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${item.completion}%`, borderRadius: 5 }} />
+            </View>
+            <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{item.completion % 1 == 0 ? item.completion : item.completion.toFixed(2)}%</Text>
+          </View>
+          {item.activities_pending.map(pen => {
+            return (
+              <View key={pen.id}>
+                <View style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", padding: "1.5%", marginRight: "2%" }}>
+                  <MaterialIcons onPress={() => activityCompleted(pen, item)} name="check-box-outline-blank" size={24} color="black" style={{ marginRight: "2%" }} />
+                  <Text style={{ fontSize: 20, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
+                </View>
+                {pen.points == 0 && pen.deadline_at == null && pen.recurring == "" ?
+                  null :
+                  <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
+                    {pen.points > 0 ?
+                      <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
+                        <FontAwesome5 name="coins" size={14} color="#48B0B1" />
+                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
+                      </View>
+                      : null}
+                    {pen.recurring == "daily" ?
+                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                        <Entypo name="cycle" size={20} color="black" />
+                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
+                      </View>
+                      : null}
+                    {pen.recurring == "weekly" ?
+                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                        <Entypo name="cycle" size={20} color="black" />
+                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> WEEKLY</Text>
+                      </View>
+                      : null}
+                    {pen.recurring == "monthly" ?
+                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                        <Entypo name="cycle" size={20} color="black" />
+                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> MONTHLY</Text>
+                      </View>
+                      : null}
+                    {pen.recurring == "quarterly" ?
+                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                        <Entypo name="cycle" size={20} color="black" />
+                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> QUARTERLY</Text>
+                      </View>
+                      : null}
+                    {pen.deadline_at !== null ?
+                      <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
+                        <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
+                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> {pen.deadline_at}</Text>
+                      </View>
+                      : null}
+                  </View>
+
+                }
+              </View>
+            )
+          })}
+          {item.activities_overdue.length > 1 ?
+            <TouchableOpacity onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }} style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
+              <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{item.activities_overdue.length} OVERDUE ACTIVITIES </Text>
+              <SimpleLineIcons name="arrow-right" size={14} color="#F84B01" />
+            </TouchableOpacity>
+            : null}
+          {item.activities_overdue.length == 1 ?
+            <TouchableOpacity onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }} style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
+              <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{item.activities_overdue.length} OVERDUE ACTIVITY </Text>
+              <SimpleLineIcons name="arrow-right" size={14} color="#F84B01" />
+            </TouchableOpacity>
+            : null}
+          {item.activities_finished.length > 1 ?
+            <TouchableOpacity onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }} style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
+              <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "black" }}>{item.activities_finished.length} COMPLETED ACTIVITIES </Text>
+              <SimpleLineIcons name="arrow-right" size={14} color="black" />
+            </TouchableOpacity>
+            : null}
+          {item.activities_finished.length == 1 ?
+            <TouchableOpacity onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }} style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
+              <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "black" }}>{item.activities_finished.length} COMPLETED ACTIVITY </Text>
+              <SimpleLineIcons name="arrow-right" size={14} color="black" />
+            </TouchableOpacity>
+            : null}
+        </View>
+    )
+  };
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={{ flex: 1 }}>
@@ -92,115 +207,17 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
           <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
           <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
         </View>
-        <ScrollView style={{ width: "100%" }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-          <View onStartShouldSetResponder={() => true}>
-            {goals.map(elm => {
-              return (
-                <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%" }}>
-                  {elm.category == "core" ?
-                    <TouchableOpacity style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                      <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%", marginTop: "1%", alignSelf: "flex-start" }} />
-                      <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
-                    </TouchableOpacity>
-                    : null}
-                  {elm.category == "context" ?
-                    <TouchableOpacity style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                      <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "10%" }}>{elm.name}</Text>
-                    </TouchableOpacity>
-                    : null}
-                  {elm.category == "healthy_habits" ?
-                    <TouchableOpacity style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }} onPress={() => { navigation.navigate('Goal', { goal: elm }); setSelectedGoal(elm.id) }}>
-                      <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%", marginTop: "1%", alignSelf: "flex-start" }} />
-                      <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular" }}>{elm.name}</Text>
-                    </TouchableOpacity>
-                    : null}
-                  <View style={{ flexDirection: "row", paddingLeft: "13.5%", marginTop: ".8%", marginBottom: "2.5%", alignItems: "center" }}>
-                    <View style={{ backgroundColor: "#D1EBEC", height: 5, width: "35%", borderRadius: 5, marginRight: "3%" }}>
-                      <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${elm.completion}%`, borderRadius: 5 }} />
-                    </View>
-                    <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{elm.completion}%</Text>
-                  </View>
-                  {elm.activities_pending.map(pen => {
-                    return (
-                      <View key={pen.id}>
-                        <View style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", padding: "1.5%", marginRight: "2%" }}>
-                          <MaterialIcons onPress={() => activityCompleted(pen, elm)} name="check-box-outline-blank" size={24} color="black" style={{ marginRight: "2%" }} />
-                          <Text style={{ fontSize: 20, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
-                        </View>
-                        {pen.points == 0 && pen.deadline_at == null && pen.recurring == "" ?
-                          null :
-                          <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
-                            {pen.points > 0 ?
-                              <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
-                                <FontAwesome5 name="coins" size={14} color="#48B0B1" />
-                                <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>  {pen.points}  POINTS</Text>
-                              </View>
-                              : null}
-                            {pen.recurring == "daily" ?
-                              <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                                <Entypo name="cycle" size={20} color="black" />
-                                <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
-                              </View>
-                              : null}
-                            {pen.recurring == "weekly" ?
-                              <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                                <Entypo name="cycle" size={20} color="black" />
-                                <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> WEEKLY</Text>
-                              </View>
-                              : null}
-                            {pen.recurring == "monthly" ?
-                              <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                                <Entypo name="cycle" size={20} color="black" />
-                                <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> MONTHLY</Text>
-                              </View>
-                              : null}
-                            {pen.recurring == "quarterly" ?
-                              <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                                <Entypo name="cycle" size={20} color="black" />
-                                <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> QUARTERLY</Text>
-                              </View>
-                              : null}
-                            {pen.deadline_at !== null ?
-                              <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                                <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
-                                <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> {pen.deadline_at}</Text>
-                              </View>
-                              : null}
-                          </View>
-
-                        }
-                      </View>
-                    )
-                  })}
-                  { elm.activities_overdue.length > 1 ?
-                    <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
-                      <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{elm.activities_overdue.length} OVERDUE ACTIVITIES </Text>
-                      <SimpleLineIcons name="arrow-right" size={14} color="#F84B01" />
-                    </TouchableOpacity>
-                    : null}
-                  { elm.activities_overdue.length == 1 ?
-                    <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
-                      <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{elm.activities_overdue.length} OVERDUE ACTIVITY </Text>
-                      <SimpleLineIcons name="arrow-right" size={14} color="#F84B01" />
-                    </TouchableOpacity>
-                    : null}
-                  { elm.activities_finished.length > 1 ?
-                    <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
-                      <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "black" }}>{elm.activities_finished.length} COMPLETED ACTIVITIES </Text>
-                      <SimpleLineIcons name="arrow-right" size={14} color="black" />
-                    </TouchableOpacity>
-                    : null}
-                  { elm.activities_finished.length == 1 ?
-                    <TouchableOpacity style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", marginTop: "1%" }}>
-                      <Text style={{ fontSize: 15, fontFamily: "OpenSans_400Regular", color: "black" }}>{elm.activities_finished.length} COMPLETED ACTIVITY </Text>
-                      <SimpleLineIcons name="arrow-right" size={14} color="black" />
-                    </TouchableOpacity>
-                    : null}
-                </View>
-              )
-            })}
-          </View>
-        </ScrollView>
+        {/* <ScrollView style={{ width: "100%" }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}> */}
+        {/* <View onStartShouldSetResponder={() => true}> */}
+        <View style={{ flex: 1 }}>
+          <DraggableFlatList
+            keyExtractor={(goal) => goal.id}
+            data={goals}
+            renderItem={dragList}
+            onDragEnd={({ data }) => goalsRecieved(data)}
+          />
+        </View>
+        {/* </ScrollView> */}
         <AntDesign name="pluscircle" size={64} color="black" style={{
           width: 80,
           height: 80,

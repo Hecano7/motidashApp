@@ -136,8 +136,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         console.log(error);
       });
 
-    alert("A new goal has been added.");
-
     sheetRef.current.snapTo(2);
 
     dispatch(onUserData(token));
@@ -173,8 +171,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       console.log(error);
     });
 
-    alert("Goal has been updated.");
-
     updateRef.current.snapTo(2);
 
     goalTabNav.navigate('GoalsList');
@@ -201,8 +197,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       console.log(error);
     });
 
-    alert("Goal has been removed.");
-
     updateRef.current.snapTo(2);
 
     goalTabNav.navigate('GoalsList');
@@ -226,8 +220,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     .catch((error) => {
       console.log(error);
     });
-
-    alert("Goal has been removed.");
 
     updateRef.current.snapTo(2);
 
@@ -265,8 +257,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         console.log("Error: ", error);
       });
 
-    alert("A new activity has been added.");
-
     addActivityRef.current.snapTo(2);
 
     dispatch(onUserData(token));
@@ -301,8 +291,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
         console.log("Error: ", error);
       });
 
-    alert("A new activity has been updated.");
-
     activityRef.current.snapTo(2);
 
     dispatch(onUserData(token));
@@ -329,8 +317,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     activityRef.current.snapTo(2);
 
-    alert("Activity has been marked as completed.");
-
     dispatch(onUserData(token));
   };
 
@@ -353,8 +339,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       });
 
     activityRef.current.snapTo(2);
-
-    alert("Activity has been removed.");
 
     setTimeout(function () { dispatch(onUserData(token)); }, 3000);
 
