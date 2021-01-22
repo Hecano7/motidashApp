@@ -165,7 +165,7 @@ function SignIn({ navigation }:
               </TouchableOpacity>
             </View>
           </View>
-      {load && <ActivityIndicator animating={true} color={"#47AFB0"} style={styles.loading} />}
+      {load && <ActivityIndicator animating={true} style={styles.loading} />}
     </View>
     </TouchableWithoutFeedback>
   )

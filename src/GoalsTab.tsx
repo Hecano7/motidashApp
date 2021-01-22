@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Text, View, SafeAreaView, TouchableWithoutFeedback, Keyboard, Alert, Button, RefreshControl } from "react-native";
+import { Text, View, SafeAreaView, TouchableWithoutFeedback, Keyboard, Alert, Button, RefreshControl, StyleSheet, ActivityIndicator } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState, onUserData } from '../src/redux';
 import { Fontisto, Entypo, FontAwesome5, MaterialCommunityIcons, Ionicons, SimpleLineIcons, MaterialIcons } from '@expo/vector-icons';
@@ -14,10 +14,11 @@ interface GoalsListProps {
   sheetRef,
   navigation,
   setSelectedGoal,
-  setGoalTabNav
+  setGoalTabNav,
+  load
 }
 
-export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, navigation, setSelectedGoal }) => {
+export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheetRef, navigation, setSelectedGoal }) => {
   setGoalTabNav(navigation);
   const dispatch = useDispatch();
   const { user } = useSelector((state: ApplicationState) => state.userReducer);
@@ -89,32 +90,32 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
     return (
         <View onStartShouldSetResponder={() => true} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%", backgroundColor: "#F2F2F2" }}>
           {item.category == "core" ?
-            <View style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
+            <View style={{ flexDirection: "row", padding: "5%", paddingLeft: "3%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
+              <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
               <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
                 <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%", marginTop: "1%" }} />
                 <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "93%" }}>{item.name}</Text>
               </TouchableOpacity>
-              <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
             </View>
             : null}
           {item.category == "context" ?
-            <View style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
-              <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
-                <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "10%", width: "93%" }}>{item.name}</Text>
-              </TouchableOpacity>
+            <View style={{ flexDirection: "row", padding: "5%", paddingLeft: "3%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
               <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
+              <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
+                <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "3%", width: "95%" }}>{item.name}</Text>
+              </TouchableOpacity>
             </View>
             : null}
           {item.category == "healthy_habits" ?
-            <View style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
+            <View style={{ flexDirection: "row", padding: "5%", paddingLeft: "3%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
+              <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
               <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
                 <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%", marginTop: "1%" }} />
                 <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "93%" }}>{item.name}</Text>
               </TouchableOpacity>
-              <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{alignSelf: "flex-start", marginTop: "1.5%"}}/>
             </View>
             : null}
-          <View style={{ flexDirection: "row", paddingLeft: "13.5%", marginTop: ".8%", marginBottom: "2.5%", alignItems: "center" }}>
+          <View style={{ flexDirection: "row", paddingLeft: "13.5%", marginTop: ".8%", alignItems: "center" }}>
             <View style={{ backgroundColor: "#D1EBEC", height: 5, width: "35%", borderRadius: 5, marginRight: "3%" }}>
               <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${item.completion}%`, borderRadius: 5 }} />
             </View>
@@ -124,12 +125,12 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
             return (
               <View key={pen.id}>
                 <View style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", padding: "1.5%", marginRight: "2%" }}>
-                  <MaterialIcons onPress={() => activityCompleted(pen, item)} name="check-box-outline-blank" size={24} color="black" style={{ marginRight: "2%" }} />
+                <Ionicons name="ios-square-outline" onPress={() => activityCompleted(pen, item)} size={24} color="black" style={{ marginRight: "2%" }} />
                   <Text style={{ fontSize: 20, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
                 </View>
                 {pen.points == 0 && pen.deadline_at == null && pen.recurring == "" ?
                   null :
-                  <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
+                  <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", paddingBottom: 6 }}>
                     {pen.points > 0 ?
                       <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "#D1EBEC", borderRadius: 50, paddingLeft: 10, paddingRight: 10, padding: 2, marginRight: 4 }}>
                         <FontAwesome5 name="coins" size={14} color="#48B0B1" />
@@ -138,32 +139,32 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
                       : null}
                     {pen.recurring == "daily" ?
                       <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <Entypo name="cycle" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
+                        <Entypo name="cycle" size={16} color="black" />
+                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_400Regular", color: "black" }}> DAILY</Text>
                       </View>
                       : null}
                     {pen.recurring == "weekly" ?
                       <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <Entypo name="cycle" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> WEEKLY</Text>
+                        <Entypo name="cycle" size={16} color="black" />
+                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_400Regular", color: "black" }}> WEEKLY</Text>
                       </View>
                       : null}
                     {pen.recurring == "monthly" ?
                       <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <Entypo name="cycle" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> MONTHLY</Text>
+                        <Entypo name="cycle" size={16} color="black" />
+                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_400Regular", color: "black" }}> MONTHLY</Text>
                       </View>
                       : null}
                     {pen.recurring == "quarterly" ?
                       <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
-                        <Entypo name="cycle" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> QUARTERLY</Text>
+                        <Entypo name="cycle" size={16} color="black" />
+                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_400Regular", color: "black" }}> QUARTERLY</Text>
                       </View>
                       : null}
                     {pen.deadline_at !== null ?
                       <View style={{ flexDirection: "row", alignItems: "center", marginRight: "2%", marginLeft: "2%" }}>
                         <MaterialCommunityIcons name="calendar-month-outline" size={20} color="black" />
-                        <Text style={{ fontSize: 16, fontFamily: "OpenSans_400Regular", color: "black" }}> {pen.deadline_at}</Text>
+                        <Text style={{ fontSize: 14, fontFamily: "OpenSans_600SemiBold", color: "black" }}> {pen.deadline_at}</Text>
                       </View>
                       : null}
                   </View>
@@ -203,7 +204,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ height: "15%", flexDirection: "row", paddingLeft: "5%", alignItems: "flex-end", paddingBottom: "3%" }}>
+        <View style={{ height: "15%", flexDirection: "row", paddingLeft: "8.8%", alignItems: "flex-end", paddingBottom: "3%" }}>
           <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
           <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
         </View>
@@ -214,7 +215,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
             onDragEnd={({ data }) => goalsRecieved(data)}
             refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           />
-        <AntDesign name="pluscircle" size={64} color="black" style={{
+        <AntDesign name="pluscircle" size={64} color="white" style={{
           width: 80,
           height: 80,
           borderRadius: 30,
@@ -224,6 +225,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
           color: "#48B0B1"
         }}
           onPress={() => sheetRef.current.snapTo(0)} />
+      {load == true ? <ActivityIndicator animating={true} style={styles.loading} /> : null}
       </SafeAreaView>
     </TouchableWithoutFeedback>
   )
@@ -237,10 +239,11 @@ interface GoalProps {
   activityRef,
   setCompleted,
   setSelectedActivity,
-  autoPopulateWindow
+  autoPopulateWindow,
+  load
 }
 
-export const Goal: React.FC<GoalProps> = ({ navigation, route, updateRef, addActivityRef, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow }) => {
+export const Goal: React.FC<GoalProps> = ({load, navigation, route, updateRef, addActivityRef, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state: ApplicationState) => state.userReducer);
   const { token } = user;
@@ -304,7 +307,7 @@ export const Goal: React.FC<GoalProps> = ({ navigation, route, updateRef, addAct
                     <Text style={{ fontSize: 16, fontFamily: "OpenSans_600SemiBold", width: "90%", color: "#F84B01", paddingLeft: "5%", paddingTop: "5%" }}>OVERDUE ACTIVITIES</Text>
                     {/* onPress={() => activityCompleted(pen, goalSelected)} */}
                     <TouchableOpacity onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); autoPopulateWindow(pen.id, goalSelected.id, "activities_overdue"); }} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                      <MaterialIcons name="check-box-outline-blank" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
+                      <Ionicons name="ios-square-outline" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
                       <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%", color: "#F84B01" }}>{pen.name}</Text>
                     </TouchableOpacity>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -355,7 +358,7 @@ export const Goal: React.FC<GoalProps> = ({ navigation, route, updateRef, addAct
                   return (
                     <View key={pen.id}>
                       <TouchableOpacity onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%" }}>
-                        <MaterialIcons name="check-box-outline-blank" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
+                        <Ionicons name="ios-square-outline" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
                         <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                       </TouchableOpacity>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -466,7 +469,12 @@ export const Goal: React.FC<GoalProps> = ({ navigation, route, updateRef, addAct
           color: "#48B0B1"
         }}
           onPress={() => addActivityRef.current.snapTo(0)} />
+      {load == true ? <ActivityIndicator animating={true} style={styles.loading} /> : null}
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 };
+
+const styles = StyleSheet.create({
+  loading: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, opacity: 0.5, backgroundColor: 'black', justifyContent: 'center', alignItems: 'center' }
+});

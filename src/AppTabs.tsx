@@ -36,15 +36,15 @@ function LeaderBoard() {
   )
 }
 
-function GoalsTab({ setGoalTabNav, sheetRef, updateRef, addActivityRef, setSelectedGoal, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow }) {
+function GoalsTab({load, setGoalTabNav, sheetRef, updateRef, addActivityRef, setSelectedGoal, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow }) {
   const GoalsStack = createStackNavigator();
   return (
     <GoalsStack.Navigator initialRouteName="GoalsList">
       <GoalsStack.Screen name="GoalsList" options={{ header: () => null }} >
-        {(props) => <GoalsList  {...props} sheetRef={sheetRef} setSelectedGoal={setSelectedGoal} setGoalTabNav={setGoalTabNav} />}
+        {(props) => <GoalsList  {...props} load={load} sheetRef={sheetRef} setSelectedGoal={setSelectedGoal} setGoalTabNav={setGoalTabNav} />}
       </GoalsStack.Screen>
       <GoalsStack.Screen name="Goal" options={{ header: () => null }} >
-        {(props) => <Goal  {...props} updateRef={updateRef} activityRef={activityRef} addActivityRef={addActivityRef} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow} />}
+        {(props) => <Goal  {...props} load={load} updateRef={updateRef} activityRef={activityRef} addActivityRef={addActivityRef} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow} />}
       </GoalsStack.Screen>
     </GoalsStack.Navigator>
   );
@@ -99,6 +99,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     // dispatch(onLogin(email, password));
   };
 
+  const [load, loading] = useState(false);
   const [goalTabNav, setGoalTabNav] = useState([]);
   const [selectedGoal, setSelectedGoal] = useState('');
   const [selectedActivity, setSelectedActivity] = useState('');
@@ -110,7 +111,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const [second, setSecond] = useState('white');
   const [third, setThird] = useState('white');
   const [selectedValue, setSelectedValue] = useState("");
-  const [selectedStartDate, setSelectedStartDate] = useState(moment().format("YYYY-MM-DD"));
+  const [selectedStartDate, setSelectedStartDate] = useState(moment().format("MM-DD-YYYY"));
   const [backgroundColor, setBackgroundColor] = useState('white');
   const [toggle, setToggle] = useState('recurring');
   const [completed, setCompleted] = useState(false);
@@ -137,8 +138,12 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       });
 
     sheetRef.current.snapTo(2);
-
+    
     dispatch(onUserData(token));
+
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
   };
 
   const updateGoal = () => {
@@ -176,6 +181,10 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     goalTabNav.navigate('GoalsList');
 
     dispatch(onUserData(token));
+    
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
 
   };
 
@@ -200,8 +209,12 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     updateRef.current.snapTo(2);
 
     goalTabNav.navigate('GoalsList');
-
+    
     dispatch(onUserData(token));
+        
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
   };
 
   const completeGoal = () => {
@@ -224,8 +237,12 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     updateRef.current.snapTo(2);
 
     goalTabNav.navigate('GoalsList');
-
+        
     dispatch(onUserData(token));
+    
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
   };
 
   const addNewActivity = () => {
@@ -258,8 +275,12 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       });
 
     addActivityRef.current.snapTo(2);
-
+    
     dispatch(onUserData(token));
+        
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
   };
 
   const updateActivity = () => {
@@ -292,6 +313,10 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       });
 
     activityRef.current.snapTo(2);
+        
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
 
     dispatch(onUserData(token));
   };
@@ -318,6 +343,10 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     activityRef.current.snapTo(2);
 
     dispatch(onUserData(token));
+        
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
   };
 
   const removeActivity = (activityId, goalId) => {
@@ -340,7 +369,11 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     activityRef.current.snapTo(2);
 
-    setTimeout(function () { dispatch(onUserData(token)); }, 3000);
+    dispatch(onUserData(token));
+
+    loading(true);
+
+    setTimeout(function(){ loading(false); }, 2000);
 
   };
 
@@ -376,7 +409,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               };
               if (userGoal[i].activities_finished[n].deadline_at !== null) {
                 let split = userGoal[i].activities_finished[n].deadline_at.split("/");
-                setSelectedStartDate(`${split[2]}-${split[0]}-${split[1]}`);
+                setSelectedStartDate(`${split[0]}-${split[1]}-${split[2]}`);
                 setToggle("date");
                 select("fith");
               };
@@ -402,7 +435,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               };
               if (userGoal[i].activities_overdue[n].deadline_at !== null) {
                 let split = userGoal[i].activities_overdue[n].deadline_at.split("/");
-                setSelectedStartDate(`${split[2]}-${split[0]}-${split[1]}`);
+                setSelectedStartDate(`${split[0]}-${split[1]}-${split[2]}`);
                 setToggle("date");
                 select("fith");
               };
@@ -428,7 +461,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               };
               if (userGoal[i].activities_pending[n].deadline_at !== null) {
                 let split = userGoal[i].activities_pending[n].deadline_at.split("/");
-                setSelectedStartDate(`${split[2]}-${split[0]}-${split[1]}`);
+                setSelectedStartDate(`${split[0]}-${split[1]}-${split[2]}`);
                 setToggle("date");
                 select("fith");
               };
@@ -488,6 +521,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const onCloseWindow = () => {
     setFirstText("");
     select("first");
+    select("fourth");
   };
 
   const sheetRef = React.useRef(null);
@@ -628,7 +662,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
                 style={{ height: "100%", width: "100%", justifyContent: "center" }}
                 onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue.toString())}
               >
-                <Picker.Item label="Once" value="" />
+                <Picker.Item label="" value="" />
                 <Picker.Item label="Everyday" value="daily" />
                 <Picker.Item label="Every Week" value="weekly" />
                 <Picker.Item label="Every Month" value="monthly" />
@@ -656,7 +690,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
       </View>
       <View style={{ marginTop: "5%" }}>
         <CalendarPicker
-          onDateChange={(x) => { setSelectedStartDate(x.format("YYYY-MM-DD").toString()); setTimeout(() => { calendarRef.current.snapTo(2); }, 900); setBackgroundColor('white'); console.log(x.format("YYYY-MM-DD").toString()) }}
+          onDateChange={(x) => { setSelectedStartDate(x.format("MM-DD-YYYY").toString()); setTimeout(() => { calendarRef.current.snapTo(2); }, 900); setBackgroundColor('white'); console.log(x.format("YYYY-MM-DD").toString()) }}
           width={350}
         />
       </View>
@@ -788,7 +822,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               <Moticon name='Bullseye-Pointer' size={30} color={color} />
             ),
           }}>
-          {(props) => <GoalsTab  {...props} setGoalTabNav={setGoalTabNav} sheetRef={sheetRef} updateRef={updateRef} addActivityRef={addActivityRef} activityRef={activityRef} setSelectedGoal={setSelectedGoal} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow} />}
+          {(props) => <GoalsTab  {...props} load={load} setGoalTabNav={setGoalTabNav} sheetRef={sheetRef} updateRef={updateRef} addActivityRef={addActivityRef} activityRef={activityRef} setSelectedGoal={setSelectedGoal} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow} />}
         </Tabs.Screen>
         <Tabs.Screen
           name='ActionPlans'
