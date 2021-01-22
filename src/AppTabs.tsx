@@ -731,7 +731,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
                         style={{ height: "100%", width: "100%", justifyContent: "center" }}
                         onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue.toString())}
                       >
-                        <Picker.Item label="Once" value="" />
+                        <Picker.Item label="" value="" />
                         <Picker.Item label="Everyday" value="daily" />
                         <Picker.Item label="Every Week" value="weekly" />
                         <Picker.Item label="Every Month" value="monthly" />
@@ -754,7 +754,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
                       style={{ height: "100%", width: "100%", justifyContent: "center" }}
                       onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue.toString())}
                     >
-                      <Picker.Item label="Once" value="" />
+                      <Picker.Item label="" value="" />
                       <Picker.Item label="Everyday" value="daily" />
                       <Picker.Item label="Every Week" value="weekly" />
                       <Picker.Item label="Every Month" value="monthly" />
