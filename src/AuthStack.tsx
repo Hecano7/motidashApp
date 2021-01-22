@@ -110,14 +110,14 @@ function SignIn({ navigation }:
   const { user, error } = useSelector((state: ApplicationState) => state.userReducer);
   const { token } = user;
   useEffect(() => {
-    if (token !== undefined) {
+    if (token !== undefined && token !== "invalid") {
       console.log("Token: ", token);
       // console.log(user);
       loading(false);
       dispatch(onUserData(token));
       login();
     };
-    if (error !== undefined) {
+    if (token == "invalid") {
       // console.log(error);
       alert("Incorrect username or password");
       loading(false);

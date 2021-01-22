@@ -51,8 +51,8 @@ export const onLogin = (email: string, password: string) => {
       }
     } catch (error) {
       dispatch({
-        type: 'ON_ERROR',
-        payload: error,
+        type: 'ON_LOGIN',
+        payload: { token: "invalid"},
       });
     }
   };
