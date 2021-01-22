@@ -87,7 +87,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
 
   const dragList = ({ item, index, drag, isActive }) => {
     return (
-        <View style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%", backgroundColor: "#F2F2F2" }}>
+        <View onStartShouldSetResponder={() => true} style={{ borderTopColor: '#D8D8D8', borderTopWidth: 1, paddingBottom: "5%", backgroundColor: "#F2F2F2" }}>
           {item.category == "core" ?
             <View style={{ flexDirection: "row", padding: "5%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
               <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
@@ -207,17 +207,13 @@ export const GoalsList: React.FC<GoalsListProps> = ({ setGoalTabNav, sheetRef, n
           <Moticon name='Bullseye-Pointer' size={30} color={"black"} style={{ marginRight: "3%", marginBottom: "2%" }} />
           <Text style={{ fontSize: 30, fontFamily: "OpenSans_600SemiBold" }}>Goals</Text>
         </View>
-        {/* <ScrollView style={{ width: "100%" }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}> */}
-        {/* <View onStartShouldSetResponder={() => true}> */}
-        <View style={{ flex: 1 }}>
           <DraggableFlatList
             keyExtractor={(goal) => goal.id}
             data={goals}
             renderItem={dragList}
             onDragEnd={({ data }) => goalsRecieved(data)}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
           />
-        </View>
-        {/* </ScrollView> */}
         <AntDesign name="pluscircle" size={64} color="black" style={{
           width: 80,
           height: 80,
