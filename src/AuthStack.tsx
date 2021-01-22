@@ -6,12 +6,31 @@ import { AuthContext } from './AuthProvider';
 import { Header } from './Header';
 import { useSelector, useDispatch } from 'react-redux';
 import { ApplicationState, onLogin, onUserData } from '../src/redux';
+import AsyncStorage from '@react-native-community/async-storage';
 
 interface AuthStackProps { store: any };
 
 const Stack = createStackNavigator<AuthParamList>();
 
 function StartUp({ navigation }) {
+  const dispatch = useDispatch();
+  const { login } = useContext(AuthContext);
+
+  useEffect(() => {
+    AsyncStorage.getItem('account')
+    .then(userString => {
+      if (userString) {
+        dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
+        login();
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
+    //do nothing
+  }, []);
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
     <View style={styles.container}>
@@ -121,7 +140,18 @@ function SignIn({ navigation }:
       // console.log(error);
       alert("Incorrect username or password");
       loading(false);
-    }
+    };
+    AsyncStorage.getItem('account')
+    .then(userString => {
+      if (userString) {
+        dispatch(onLogin(JSON.parse(userString).email, JSON.parse(userString).password));
+        loading(false);
+      }
+    })
+    .catch(err => {
+      console.log(err);
+    });
+
     //do nothing
   }, [user, error]);
 
