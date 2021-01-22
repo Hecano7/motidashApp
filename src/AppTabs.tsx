@@ -762,7 +762,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   return (
     <View style={{ flex: 1 }}>
       <Tabs.Navigator
-        lazy={false}
+        lazy={true}
         tabBarOptions={{
           activeTintColor: 'white',
           iconStyle: {
