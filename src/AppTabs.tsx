@@ -178,8 +178,6 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     updateRef.current.snapTo(2);
 
-    goalTabNav.navigate('GoalsList');
-
     dispatch(onUserData(token));
     
     loading(true);
@@ -246,11 +244,12 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   };
 
   const addNewActivity = () => {
-    console.log(selectedGoal);
     let data = new FormData();
     data.append('okr_activity[name]', firstText);
+    data.append('okr_activity[deadline_at]', selectedStartDate);
     if (toggle == "date") {
-      data.append('okr_activity[deadline_at]', selectedStartDate);
+      let date = selectedStartDate.split("-");
+      data.append('okr_activity[deadline_at]', `${date[2]}-${date[0]}-${date[1]}`);
     } else {
       data.append('okr_activity[recurring]', selectedValue);
     };
@@ -287,12 +286,11 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     let data = new FormData();
     data.append('okr_activity[name]', firstText);
     if (toggle == "date") {
-      data.append('okr_activity[deadline_at]', selectedStartDate);
+      let date = selectedStartDate.split("-");
+      data.append('okr_activity[deadline_at]', `${date[2]}-${date[0]}-${date[1]}`);
     } else {
       data.append('okr_activity[recurring]', selectedValue);
     };
-
-    console.log(toggle);
 
     const config = {
       method: 'patch',
@@ -409,7 +407,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               };
               if (userGoal[i].activities_finished[n].deadline_at !== null) {
                 let split = userGoal[i].activities_finished[n].deadline_at.split("/");
-                setSelectedStartDate(`${split[0]}-${split[1]}-${split[2]}`);
+                setSelectedStartDate(`${split[2]}-${split[1]}-${split[2]}`);
                 setToggle("date");
                 select("fith");
               };
