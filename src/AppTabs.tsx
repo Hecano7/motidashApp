@@ -117,7 +117,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const [completed, setCompleted] = useState(false);
 
   const addNewGoal = () => {
-    const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": categoryText } });
+    const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": categoryText, "position":0 } });
 
     const config = {
       method: 'post',
@@ -131,7 +131,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     axios(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        console.log("Goal_Response: ",JSON.stringify(response.data.id));
       })
       .catch((error) => {
         console.log(error);

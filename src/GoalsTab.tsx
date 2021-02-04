@@ -80,6 +80,30 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
     );
   };
 
+  const sendOrder = (x) => {
+    let data = new FormData();
+  
+    x.map(item => data.append('okr_objective[]', item.id));
+      
+      let config = {
+        method: 'patch',
+        url: `${BASE_URL}goals/objectives/sort.json`,
+        headers: { 
+          'token': token, 
+        },
+        data : data
+      };
+      
+      axios(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      
+  };
+
   const wait = (timeout) => {
     return new Promise(resolve => {
       setTimeout(resolve, timeout);
@@ -100,7 +124,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
             <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{ alignSelf: "flex-start", marginTop: "1.5%" }} />
             <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
               <Fontisto name="star" size={24} color="#FFC756" style={{ marginRight: "3%", marginTop: "1%" }} />
-              <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "93%" }}>{item.name}</Text>
+              <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "88%"}}>{item.name}</Text>
             </TouchableOpacity>
           </View>
           : null}
@@ -108,7 +132,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
           <View style={{ flexDirection: "row", padding: "5%", paddingLeft: "3%", paddingBottom: "0%", alignItems: "center", width: "95%" }}>
             <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{ alignSelf: "flex-start", marginTop: "1.5%" }} />
             <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
-              <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "3%", width: "95%" }}>{item.name}</Text>
+              <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", marginLeft: "3%", width: "95%"}}>{item.name}</Text>
             </TouchableOpacity>
           </View>
           : null}
@@ -117,7 +141,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
             <Entypo onLongPress={drag} name="dots-three-vertical" size={23} color="grey" style={{ alignSelf: "flex-start", marginTop: "1.5%" }} />
             <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => { navigation.navigate('Goal', { goal: item }); setSelectedGoal(item.id) }}>
               <FontAwesome5 name="apple-alt" size={24} color="#48B0B1" style={{ marginRight: "3%", marginTop: "1%" }} />
-              <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "93%" }}>{item.name}</Text>
+              <Text style={{ fontSize: 24, fontFamily: "OpenSans_400Regular", width: "88%" }}>{item.name}</Text>
             </TouchableOpacity>
           </View>
           : null}
@@ -218,7 +242,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
           keyExtractor={(goal) => goal.id}
           data={goals}
           renderItem={dragList}
-          onDragEnd={({ data }) => goalsRecieved(data)}
+          onDragEnd={({ data }) => {goalsRecieved(data); sendOrder(data);}}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         />
         <AntDesign name="pluscircle" size={64} color="white" style={{
@@ -331,7 +355,7 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
           <View style={{ backgroundColor: "#D1EBEC", height: 6, width: "35%", borderRadius: 5, marginRight: "3%" }}>
             <View style={{ backgroundColor: "#48B0B1", height: "100%", width: `${goalSelected.completion}%`, borderRadius: 5 }} />
           </View>
-          <Text style={{ fontSize: 15, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{goalSelected.completion}%</Text>
+          <Text style={{ fontSize: 15, fontFamily: "OpenSans_600SemiBold", color: "#48B0B1" }}>{goal.completion % 1 == 0 ? goal.completion : goal.completion.toFixed(2)}%</Text>
         </View>
         <ScrollView style={{ width: "100%", height: "100%" }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <View style={{ width: "100%", height: "300%" }} onStartShouldSetResponder={() => true}>
@@ -343,7 +367,7 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
                     {/* onPress={() => activityCompleted(pen, goalSelected)} */}
                     <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%"}}>
                         <Ionicons onPress={() => activityCompleted(pen.id, goal.id)} name="ios-square-outline" size={33} color="#F84B01" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
-                        <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
+                        <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
                           <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{pen.name}</Text>
                         </TouchableOpacity>
                       </View>
