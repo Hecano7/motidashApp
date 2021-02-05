@@ -36,12 +36,12 @@ function LeaderBoard() {
   )
 }
 
-function GoalsTab({load, setGoalTabNav, sheetRef, updateRef, addActivityRef, setSelectedGoal, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow }) {
+function GoalsTab({load, setGoalTabNav, sheetRef, updateRef, addActivityRef, setSelectedGoal, activityRef, setCompleted, setSelectedActivity, autoPopulateWindow, goalsIdsRecieved }) {
   const GoalsStack = createStackNavigator();
   return (
     <GoalsStack.Navigator initialRouteName="GoalsList">
       <GoalsStack.Screen name="GoalsList" options={{ header: () => null }} >
-        {(props) => <GoalsList  {...props} load={load} sheetRef={sheetRef} setSelectedGoal={setSelectedGoal} setGoalTabNav={setGoalTabNav} />}
+        {(props) => <GoalsList  {...props} load={load} sheetRef={sheetRef} setSelectedGoal={setSelectedGoal} setGoalTabNav={setGoalTabNav} goalsIdsRecieved={goalsIdsRecieved}/>}
       </GoalsStack.Screen>
       <GoalsStack.Screen name="Goal" options={{ header: () => null }} >
         {(props) => <Goal  {...props} load={load} updateRef={updateRef} activityRef={activityRef} addActivityRef={addActivityRef} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow} />}
@@ -99,6 +99,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
     // dispatch(onLogin(email, password));
   };
 
+  const [goalsIds, goalsIdsRecieved] = useState([]);
   const [load, loading] = useState(false);
   const [goalTabNav, setGoalTabNav] = useState([]);
   const [selectedGoal, setSelectedGoal] = useState('');
@@ -117,7 +118,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
   const [completed, setCompleted] = useState(false);
 
   const addNewGoal = () => {
-    const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": categoryText, "position":0 } });
+    const data = JSON.stringify({ "okr_objective": { "name": firstText, "category": categoryText} });
 
     const config = {
       method: 'post',
@@ -131,19 +132,40 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
 
     axios(config)
       .then((response) => {
-        console.log("Goal_Response: ",JSON.stringify(response.data.id));
+        let data = new FormData();
+  
+        data.append('okr_objective[]', response.data.id);
+        goalsIds.map(item => data.append('okr_objective[]', item));
+          console.log()
+          let config = {
+            method: 'patch',
+            url: `${BASE_URL}goals/objectives/sort.json`,
+            headers: { 
+              'token': token, 
+            },
+            data : data
+          };
+          
+          axios(config)
+          .then((response) => {
+            response.data.map(goal => console.log(JSON.stringify(goal.name)));
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+    
+          sheetRef.current.snapTo(2);
+    
+          dispatch(onUserData(token));
+      
+          loading(true);
+      
+          setTimeout(function(){ loading(false); }, 2000);
       })
       .catch((error) => {
         console.log(error);
       });
 
-    sheetRef.current.snapTo(2);
-    
-    dispatch(onUserData(token));
-
-    loading(true);
-
-    setTimeout(function(){ loading(false); }, 2000);
   };
 
   const updateGoal = () => {
@@ -820,7 +842,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({ }) => {
               <Moticon name='Bullseye-Pointer' size={30} color={color} />
             ),
           }}>
-          {(props) => <GoalsTab  {...props} load={load} setGoalTabNav={setGoalTabNav} sheetRef={sheetRef} updateRef={updateRef} addActivityRef={addActivityRef} activityRef={activityRef} setSelectedGoal={setSelectedGoal} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow} />}
+          {(props) => <GoalsTab  {...props} load={load} setGoalTabNav={setGoalTabNav} sheetRef={sheetRef} updateRef={updateRef} addActivityRef={addActivityRef} activityRef={activityRef} setSelectedGoal={setSelectedGoal} setCompleted={setCompleted} setSelectedActivity={setSelectedActivity} autoPopulateWindow={autoPopulateWindow} goalsIdsRecieved={goalsIdsRecieved} />}
         </Tabs.Screen>
         <Tabs.Screen
           name='ActionPlans'

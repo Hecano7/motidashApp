@@ -15,10 +15,11 @@ interface GoalsListProps {
   navigation,
   setSelectedGoal,
   setGoalTabNav,
-  load
+  load,
+  goalsIdsRecieved
 }
 
-export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheetRef, navigation, setSelectedGoal }) => {
+export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheetRef, navigation, setSelectedGoal, goalsIdsRecieved }) => {
   setGoalTabNav(navigation);
   const dispatch = useDispatch();
   const [loaded, loading] = useState(false);
@@ -30,8 +31,11 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
 
   useEffect(() => {
     if ((userGoals[0] !== undefined)) {
-      console.log(userGoals);
+      // console.log(userGoals);
+      let order = [];
       goalsRecieved(JSON.parse(JSON.stringify(userGoals)));
+      JSON.parse(JSON.stringify(userGoals)).map(goals => order.push(goals.id));
+      goalsIdsRecieved(order);
     }
   }, [userGoals, error]);
 
@@ -83,7 +87,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
   const sendOrder = (x) => {
     let data = new FormData();
   
-    x.map(item => data.append('okr_objective[]', item.id));
+    x.map(item => {data.append('okr_objective[]', item.id); console.log(item.id);});
       
       let config = {
         method: 'patch',
@@ -96,7 +100,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
       
       axios(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
+        response.data.map(goal => console.log(JSON.stringify(goal.name)));
       })
       .catch((error) => {
         console.log(error);
@@ -155,7 +159,7 @@ export const GoalsList: React.FC<GoalsListProps> = ({ load, setGoalTabNav, sheet
           return (
             <View key={pen.id}>
               <View style={{ flexDirection: "row", paddingLeft: "13%", alignItems: "center", padding: "1.5%", marginRight: "2%" }}>
-                <Ionicons name="ios-square-outline" onPress={() => activityCompleted(pen, item)} size={24} color="black" style={{ marginRight: "2%" }} />
+                <Ionicons name="ios-square-outline" onPress={() => activityCompleted(pen, item)} size={24} color="black" style={{ marginRight: "2%", marginTop: "1%", alignSelf: "flex-start"  }} />
                 <Text style={{ fontSize: 20, fontFamily: "OpenSans_300Light", width: "90%" }}>{pen.name}</Text>
               </View>
               {pen.points == 0 && pen.deadline_at == null && pen.recurring == "" ?
@@ -368,7 +372,7 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
                     <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%"}}>
                         <Ionicons onPress={() => activityCompleted(pen.id, goal.id)} name="ios-square-outline" size={33} color="#F84B01" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
                         <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
-                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{pen.name}</Text>
+                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", color: "#F84B01", width: "90%" }}>{pen.name}</Text>
                         </TouchableOpacity>
                       </View>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -421,7 +425,7 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
                       <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%" }}>
                         <Ionicons onPress={() => activityCompleted(pen.id, goal.id)} name="ios-square-outline" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
                         <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
-                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular" }}>{pen.name}</Text>
+                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                         </TouchableOpacity>
                       </View>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -473,10 +477,10 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
                 {goalSelected.activities_finished.map(pen => {
                   return (
                     <View key={pen.id} >
-                      <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%" }}>
+                      <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%"}}>
                         <AntDesign name="checksquareo" size={26} color="black" style={{ marginRight: "2%", marginTop: "1%", alignSelf: "flex-start" }} />
                         <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
-                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular" }}>{pen.name}</Text>
+                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
                         </TouchableOpacity>
                       </View>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
