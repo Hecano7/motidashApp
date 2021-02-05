@@ -371,8 +371,8 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
                     {/* onPress={() => activityCompleted(pen, goalSelected)} */}
                     <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%"}}>
                         <Ionicons onPress={() => activityCompleted(pen.id, goal.id)} name="ios-square-outline" size={33} color="#F84B01" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
-                        <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
-                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", color: "#F84B01", width: "90%" }}>{pen.name}</Text>
+                        <TouchableOpacity style={{width: 320}} onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
+                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", color: "#F84B01" }}>{pen.name}</Text>
                         </TouchableOpacity>
                       </View>
                     <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -424,8 +424,8 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
                     <View key={pen.id}>
                       <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%" }}>
                         <Ionicons onPress={() => activityCompleted(pen.id, goal.id)} name="ios-square-outline" size={33} color="black" style={{ marginRight: "2%", alignSelf: "flex-start" }} />
-                        <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
-                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
+                        <TouchableOpacity style={{width: 320}} onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
+                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular"}}>{pen.name}</Text>
                         </TouchableOpacity>
                       </View>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
@@ -479,8 +479,8 @@ export const Goal: React.FC<GoalProps> = ({ load, navigation, route, updateRef, 
                     <View key={pen.id} >
                       <View style={{ flexDirection: "row", paddingLeft: "5%", alignItems: "center", padding: 6, marginRight: "2%", width: "95%"}}>
                         <AntDesign name="checksquareo" size={26} color="black" style={{ marginRight: "2%", marginTop: "1%", alignSelf: "flex-start" }} />
-                        <TouchableOpacity  onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
-                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular", width: "90%" }}>{pen.name}</Text>
+                        <TouchableOpacity style={{width: 320}} onPress={() => { activityRef.current.snapTo(0); setCompleted(false); setSelectedActivity(pen.id); console.log(pen); autoPopulateWindow(pen.id, goalSelected.id, "activities_pending"); }} >
+                          <Text style={{ fontSize: 25, fontFamily: "OpenSans_400Regular" }}>{pen.name}</Text>
                         </TouchableOpacity>
                       </View>
                       <View style={{ flexDirection: "row", paddingLeft: "14%", alignItems: "center", padding: 6 }}>
